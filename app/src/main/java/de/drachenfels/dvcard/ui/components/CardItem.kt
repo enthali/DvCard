@@ -127,17 +127,6 @@ fun CardItem(
                                 color = MaterialTheme.colorScheme.secondary
                             )
                         }
-                        
-                        if (card.countryCode.isNotEmpty()) {
-                            if (card.isPrivate) {
-                                Spacer(modifier = Modifier.width(8.dp))
-                            }
-                            Text(
-                                text = "Region: ${card.countryCode}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                        }
                     }
                 }
                 
