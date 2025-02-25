@@ -1,17 +1,18 @@
 [versions]
-agp = "8.8.0"
-kotlin = "2.0.0"
+agp = "8.8.1"
+kotlin = "2.1.10"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.0"
-composeBom = "2024.04.01"
+composeBom = "2025.02.00"
 room = "2.6.1"
 zxing = "3.5.1"
-material-icons = "1.6.0"
+material-icons = "1.7.8"
 kotlinx-coroutines = "1.7.3"
+symbolProcessing = "2.1.10-1.0.30"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -42,9 +43,10 @@ androidx-material-icons-extended = { group = "androidx.compose.material", name =
 
 # Coroutines
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
+symbol-processing = { group = "com.google.devtools.ksp", name = "symbol-processing", version = "2.1.10-1.0.30" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "symbolProcessing" }

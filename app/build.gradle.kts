@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.kotlin.kapt)  // Für Room Annotations
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -55,14 +55,17 @@ dependencies {
     // Room Database
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler)
+
+    ksp(libs.androidx.room.compiler)
     
     // ZXing für QR-Code
     implementation(libs.zxing.core)
     
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
-    
+    implementation(libs.symbol.processing)
+    implementation(libs.androidx.room.compiler)
+
     // Test Dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -71,4 +74,14 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Beheben des Annotations-Konflikts
+    configurations.all {
+        resolutionStrategy {
+            // Ältere Version ausschließen
+            exclude(group = "com.intellij", module = "annotations")
+            // Oder alternativ die neuere Version forcieren
+            force("org.jetbrains:annotations:23.0.0")
+        }
+    }
 }
