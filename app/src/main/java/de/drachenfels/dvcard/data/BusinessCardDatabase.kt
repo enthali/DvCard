@@ -58,9 +58,7 @@ abstract class BusinessCardDatabase : RoomDatabase() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
                             Log.d(LogConfig.TAG_DATABASE, "Callback: Datenbank erstellt")
-                            // PRAGMA zum Sicherstellen, dass Daten direkt geschrieben werden
-                            db.execSQL("PRAGMA synchronous = NORMAL")
-                            db.execSQL("PRAGMA journal_mode = TRUNCATE")
+                            // PRAGMA-Befehle entfernt, da sie Probleme verursachen
                         }
                         
                         override fun onOpen(db: SupportSQLiteDatabase) {

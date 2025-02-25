@@ -3,6 +3,8 @@ package de.drachenfels.dvcard.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
@@ -56,32 +58,39 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                 .padding(paddingValues)
         ) {
             // Anzeige des Erstellungsdialogs, wenn der Modus "Creating" ist
-            // Dieser Block ist jetzt außerhalb der Kartenlistenlogik
             if (editMode is BusinessCardViewModel.CardEditState.Creating && selectedCard != null) {
                 Log.d(LogConfig.TAG_UI, "Zeige Creating-Dialog für neue Karte")
+                
+                val scrollState = rememberScrollState()
+                
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxHeight(0.9f) // Begrenzt die Höhe des Cards
+                    ) {
                         Text(
                             text = "Neue Visitenkarte",
                             style = MaterialTheme.typography.titleLarge
                         )
                         
-                        de.drachenfels.dvcard.ui.components.CardEditView(
-                            card = selectedCard!!,
-                            onSaveClick = { card -> 
-                                Log.d(LogConfig.TAG_UI, "Save-Button für neue Karte geklickt")
-                                viewModel.saveCard(card) 
-                            },
-                            onDeleteClick = null,  // Keine Löschoption bei Neuanlage
-                            onCancel = { 
-                                Log.d(LogConfig.TAG_UI, "Cancel-Button für neue Karte geklickt")
-                                viewModel.closeEdit() 
-                            }
-                        )
+                        Box(modifier = Modifier.weight(1f)) {
+                            de.drachenfels.dvcard.ui.components.CardEditView(
+                                card = selectedCard!!,
+                                onSaveClick = { card -> 
+                                    Log.d(LogConfig.TAG_UI, "Save-Button für neue Karte geklickt")
+                                    viewModel.saveCard(card) 
+                                },
+                                onDeleteClick = null,  // Keine Löschoption bei Neuanlage
+                                onCancel = { 
+                                    Log.d(LogConfig.TAG_UI, "Cancel-Button für neue Karte geklickt")
+                                    viewModel.closeEdit() 
+                                }
+                            )
+                        }
                     }
                 }
             } else if (cards.isEmpty()) {

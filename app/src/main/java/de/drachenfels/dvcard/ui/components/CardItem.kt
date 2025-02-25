@@ -45,9 +45,10 @@ fun CardItem(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top // Oben ausrichten
             ) {
                 Column(modifier = Modifier.weight(1f)) {
+                    // Name, Position, Firma (wie bisher)
                     Text(
                         text = card.name,
                         style = MaterialTheme.typography.titleLarge
@@ -65,7 +66,59 @@ fun CardItem(
                         )
                     }
                     
-                    // Zusätzliche Info für private Karten oder Ländercodes
+                    // Kontaktdaten hinzufügen
+                    if (card.phone.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Tel: ${card.phone}",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    
+                    if (card.email.isNotEmpty()) {
+                        Text(
+                            text = "E-Mail: ${card.email}",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    
+                    // Adressdaten hinzufügen
+                    if (card.street.isNotEmpty() || card.city.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        
+                        if (card.street.isNotEmpty()) {
+                            Text(
+                                text = card.street,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                        
+                        val locationText = buildString {
+                            if (card.postalCode.isNotEmpty()) {
+                                append(card.postalCode)
+                                append(" ")
+                            }
+                            if (card.city.isNotEmpty()) {
+                                append(card.city)
+                            }
+                        }
+                        
+                        if (locationText.isNotEmpty()) {
+                            Text(
+                                text = locationText,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                        
+                        if (card.country.isNotEmpty()) {
+                            Text(
+                                text = card.country,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+                    
+                    // Zusätzliche Info für private Karten oder Ländercodes (wie bisher)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (card.isPrivate) {
                             Text(
@@ -88,7 +141,7 @@ fun CardItem(
                     }
                 }
                 
-                // Aktions-Buttons
+                // Aktions-Buttons (wie bisher)
                 Row {
                     IconButton(onClick = onEditClick) {
                         Icon(
@@ -105,7 +158,7 @@ fun CardItem(
                 }
             }
             
-            // Erweiterter Bearbeitungsbereich
+            // Erweiterter Bearbeitungsbereich (wie bisher)
             AnimatedVisibility(
                 visible = isExpanded,
                 enter = expandVertically(),

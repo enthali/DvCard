@@ -20,6 +20,11 @@ data class BusinessCard(
     val phone: String = "",
     val email: String = "",
     val website: String = "",
+
+    val street: String = "",
+    val postalCode: String = "",
+    val city: String = "",
+    val country: String = "",
     
     val isPrivate: Boolean = false,
     val countryCode: String = ""

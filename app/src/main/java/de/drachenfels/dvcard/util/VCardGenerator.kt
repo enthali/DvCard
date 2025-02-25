@@ -7,6 +7,8 @@ import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import de.drachenfels.dvcard.data.model.BusinessCard
+import de.drachenfels.dvcard.util.logger.Log
+import de.drachenfels.dvcard.util.logger.LogConfig
 
 /**
  * Generiert einen vCard-String im Format 3.0 aus einer BusinessCard
@@ -28,6 +30,12 @@ fun generateVCardString(card: BusinessCard): String {
         if (card.position.isNotEmpty()) {
             vCardBuilder.append("TITLE:${card.position}\n")
         }
+    }
+    
+    // Adresse
+    if (card.street.isNotEmpty() || card.city.isNotEmpty() || card.postalCode.isNotEmpty() || card.country.isNotEmpty()) {
+        val type = if (card.isPrivate) "HOME" else "WORK"
+        vCardBuilder.append("ADR;TYPE=$type:;;${card.street};${card.city};;${card.postalCode};${card.country}\n")
     }
     
     // Kontaktdaten
@@ -56,6 +64,7 @@ fun generateVCardString(card: BusinessCard): String {
  */
 fun generateVCardQrCode(card: BusinessCard, size: Int = 512): Bitmap {
     val vCardContent = generateVCardString(card)
+    Log.d(LogConfig.TAG_UTILS, "Generated vCard content: $vCardContent")
     
     val hints = hashMapOf<EncodeHintType, Any>().apply {
         put(EncodeHintType.CHARACTER_SET, "UTF-8")
