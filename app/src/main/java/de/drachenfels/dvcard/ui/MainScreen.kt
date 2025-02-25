@@ -14,6 +14,8 @@ import androidx.compose.ui.unit.dp
 import de.drachenfels.dvcard.data.model.BusinessCard
 import de.drachenfels.dvcard.ui.components.CardItem
 import de.drachenfels.dvcard.ui.components.QrCodeDialog
+import de.drachenfels.dvcard.util.logger.Log
+import de.drachenfels.dvcard.util.logger.LogConfig
 import de.drachenfels.dvcard.viewmodel.BusinessCardViewModel
 
 /**
@@ -24,10 +26,14 @@ import de.drachenfels.dvcard.viewmodel.BusinessCardViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(viewModel: BusinessCardViewModel) {
+    Log.d(LogConfig.TAG_UI, "MainScreen Composable wird ausgeführt")
+    
     val cards by viewModel.cards.collectAsState()
     val editMode by viewModel.cardEditMode.collectAsState()
     val selectedCard by viewModel.selectedCard.collectAsState()
     val qrCodeCard by viewModel.qrCodeDialogCard.collectAsState()
+    
+    Log.d(LogConfig.TAG_UI, "MainScreen State: cards=${cards.size}, editMode=$editMode, selectedCard=${selectedCard?.id}")
     
     Scaffold(
         topBar = {
@@ -36,7 +42,10 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { viewModel.createNewCard() }) {
+            FloatingActionButton(onClick = { 
+                Log.d(LogConfig.TAG_UI, "FAB geklickt - Neue Karte erstellen")
+                viewModel.createNewCard() 
+            }) {
                 Icon(Icons.Filled.Add, contentDescription = "Neue Karte hinzufügen")
             }
         }
@@ -46,14 +55,48 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (cards.isEmpty()) {
-                // Anzeige, wenn keine Karten vorhanden sind
+            // Anzeige des Erstellungsdialogs, wenn der Modus "Creating" ist
+            // Dieser Block ist jetzt außerhalb der Kartenlistenlogik
+            if (editMode is BusinessCardViewModel.CardEditState.Creating && selectedCard != null) {
+                Log.d(LogConfig.TAG_UI, "Zeige Creating-Dialog für neue Karte")
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "Neue Visitenkarte",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        
+                        de.drachenfels.dvcard.ui.components.CardEditView(
+                            card = selectedCard!!,
+                            onSaveClick = { card -> 
+                                Log.d(LogConfig.TAG_UI, "Save-Button für neue Karte geklickt")
+                                viewModel.saveCard(card) 
+                            },
+                            onDeleteClick = null,  // Keine Löschoption bei Neuanlage
+                            onCancel = { 
+                                Log.d(LogConfig.TAG_UI, "Cancel-Button für neue Karte geklickt")
+                                viewModel.closeEdit() 
+                            }
+                        )
+                    }
+                }
+            } else if (cards.isEmpty()) {
+                // Anzeige, wenn keine Karten vorhanden sind und kein Erstellungsdialog aktiv ist
+                Log.d(LogConfig.TAG_UI, "Keine Karten vorhanden, zeige EmptyState")
                 EmptyState(
-                    onCreateClick = { viewModel.createNewCard() },
+                    onCreateClick = { 
+                        Log.d(LogConfig.TAG_UI, "EmptyState-Button geklickt - Neue Karte erstellen")
+                        viewModel.createNewCard() 
+                    },
                     modifier = Modifier.align(Alignment.Center)
                 )
             } else {
                 // Liste der Karten
+                Log.d(LogConfig.TAG_UI, "Zeige Kartenliste mit ${cards.size} Karten")
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -71,37 +114,27 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                         CardItem(
                             card = card,
                             isExpanded = isExpanded,
-                            onEditClick = { viewModel.editCard(card) },
-                            onQrCodeClick = { viewModel.showQrCode(card) },
-                            onSaveClick = { updatedCard -> viewModel.saveCard(updatedCard) },
-                            onDeleteClick = { viewModel.deleteCard(card) },
-                            onCancel = { viewModel.closeEdit() }
-                        )
-                    }
-                    
-                    // Anzeige des Erstellungsdialogs, wenn der Modus "Creating" ist
-                    if (editMode is BusinessCardViewModel.CardEditState.Creating && selectedCard != null) {
-                        item {
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp)
-                            ) {
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    Text(
-                                        text = "Neue Visitenkarte",
-                                        style = MaterialTheme.typography.titleLarge
-                                    )
-                                    
-                                    de.drachenfels.dvcard.ui.components.CardEditView(
-                                        card = selectedCard!!,
-                                        onSaveClick = { card -> viewModel.saveCard(card) },
-                                        onDeleteClick = null,  // Keine Löschoption bei Neuanlage
-                                        onCancel = { viewModel.closeEdit() }
-                                    )
-                                }
+                            onEditClick = { 
+                                Log.d(LogConfig.TAG_UI, "Edit-Button geklickt für Karte ${card.id}")
+                                viewModel.editCard(card) 
+                            },
+                            onQrCodeClick = { 
+                                Log.d(LogConfig.TAG_UI, "QR-Code-Button geklickt für Karte ${card.id}")
+                                viewModel.showQrCode(card) 
+                            },
+                            onSaveClick = { updatedCard -> 
+                                Log.d(LogConfig.TAG_UI, "Save-Button geklickt für Karte ${card.id}")
+                                viewModel.saveCard(updatedCard) 
+                            },
+                            onDeleteClick = { 
+                                Log.d(LogConfig.TAG_UI, "Delete-Button geklickt für Karte ${card.id}")
+                                viewModel.deleteCard(card) 
+                            },
+                            onCancel = { 
+                                Log.d(LogConfig.TAG_UI, "Cancel-Button geklickt")
+                                viewModel.closeEdit() 
                             }
-                        }
+                        )
                     }
                 }
             }
@@ -109,9 +142,13 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
         
         // QR-Code Dialog anzeigen, wenn eine Karte ausgewählt ist
         if (qrCodeCard != null) {
+            Log.d(LogConfig.TAG_UI, "Zeige QR-Code-Dialog für Karte ${qrCodeCard?.id}")
             QrCodeDialog(
                 card = qrCodeCard!!,
-                onDismiss = { viewModel.dismissQrCode() }
+                onDismiss = { 
+                    Log.d(LogConfig.TAG_UI, "QR-Code-Dialog geschlossen")
+                    viewModel.dismissQrCode() 
+                }
             )
         }
     }
@@ -122,6 +159,7 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
  */
 @Composable
 fun EmptyState(onCreateClick: () -> Unit, modifier: Modifier = Modifier) {
+    Log.d(LogConfig.TAG_UI, "EmptyState Composable wird ausgeführt")
     Column(
         modifier = modifier.padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,

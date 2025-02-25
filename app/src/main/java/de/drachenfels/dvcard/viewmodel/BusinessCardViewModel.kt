@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import de.drachenfels.dvcard.data.BusinessCardRepository
 import de.drachenfels.dvcard.data.model.BusinessCard
+import de.drachenfels.dvcard.util.logger.Log
+import de.drachenfels.dvcard.util.logger.LogConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,9 +34,12 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
     val qrCodeDialogCard: StateFlow<BusinessCard?> = _qrCodeDialogCard.asStateFlow()
     
     init {
+        Log.d(LogConfig.TAG_VIEWMODEL, "BusinessCardViewModel initialisiert")
         // Initialisiere den Flow der Karten aus dem Repository
         viewModelScope.launch {
+            Log.d(LogConfig.TAG_VIEWMODEL, "Starte Sammlung von Karten aus Repository")
             repository.allCards.collect { cardList ->
+                Log.d(LogConfig.TAG_VIEWMODEL, "Kartenliste aktualisiert, Anzahl: ${cardList.size}")
                 _cards.value = cardList
             }
         }
@@ -44,14 +49,17 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
      * Erstellt eine neue leere Karte und öffnet den Bearbeitungsmodus
      */
     fun createNewCard() {
+        Log.d(LogConfig.TAG_VIEWMODEL, "Erstelle neue Karte")
         _selectedCard.value = BusinessCard()
         _cardEditMode.value = CardEditState.Creating
+        Log.d(LogConfig.TAG_VIEWMODEL, "Edit-Modus auf CREATING gesetzt")
     }
     
     /**
      * Öffnet eine bestehende Karte zur Bearbeitung
      */
     fun editCard(card: BusinessCard) {
+        Log.d(LogConfig.TAG_VIEWMODEL, "Öffne Karte zur Bearbeitung: ID=${card.id}, Name=${card.name}")
         _selectedCard.value = card
         _cardEditMode.value = CardEditState.Editing(card.id)
     }
@@ -60,6 +68,7 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
      * Schließt den Bearbeitungsmodus
      */
     fun closeEdit() {
+        Log.d(LogConfig.TAG_VIEWMODEL, "Schließe Bearbeitungsmodus")
         _cardEditMode.value = CardEditState.Closed
         _selectedCard.value = null
     }
@@ -68,15 +77,30 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
      * Speichert eine Karte (neu oder bearbeitet)
      */
     fun saveCard(card: BusinessCard) {
+        Log.d(LogConfig.TAG_VIEWMODEL, "saveCard aufgerufen mit Karte: ID=${card.id}, Name=${card.name}")
         viewModelScope.launch {
             when (val currentMode = _cardEditMode.value) {
                 is CardEditState.Creating -> {
-                    repository.insertCard(card)
+                    Log.d(LogConfig.TAG_VIEWMODEL, "Speichere neue Karte (Creating-Modus)")
+                    try {
+                        val newId = repository.insertCard(card)
+                        Log.d(LogConfig.TAG_VIEWMODEL, "Neue Karte erfolgreich gespeichert, ID: $newId")
+                    } catch (e: Exception) {
+                        Log.e(LogConfig.TAG_VIEWMODEL, "Fehler beim Speichern der neuen Karte", e)
+                    }
                 }
                 is CardEditState.Editing -> {
-                    repository.updateCard(card)
+                    Log.d(LogConfig.TAG_VIEWMODEL, "Aktualisiere bestehende Karte (Editing-Modus)")
+                    try {
+                        repository.updateCard(card)
+                        Log.d(LogConfig.TAG_VIEWMODEL, "Karte erfolgreich aktualisiert")
+                    } catch (e: Exception) {
+                        Log.e(LogConfig.TAG_VIEWMODEL, "Fehler beim Aktualisieren der Karte", e)
+                    }
                 }
-                else -> { /* Do nothing */ }
+                else -> {
+                    Log.w(LogConfig.TAG_VIEWMODEL, "Unerwarteter Modus beim Speichern: $currentMode")
+                }
             }
             closeEdit()
         }
@@ -86,8 +110,14 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
      * Löscht eine Karte
      */
     fun deleteCard(card: BusinessCard) {
+        Log.d(LogConfig.TAG_VIEWMODEL, "Lösche Karte: ID=${card.id}, Name=${card.name}")
         viewModelScope.launch {
-            repository.deleteCard(card)
+            try {
+                repository.deleteCard(card)
+                Log.d(LogConfig.TAG_VIEWMODEL, "Karte erfolgreich gelöscht")
+            } catch (e: Exception) {
+                Log.e(LogConfig.TAG_VIEWMODEL, "Fehler beim Löschen der Karte", e)
+            }
             closeEdit()
         }
     }
@@ -96,6 +126,7 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
      * Öffnet den QR-Code Dialog für eine Karte
      */
     fun showQrCode(card: BusinessCard) {
+        Log.d(LogConfig.TAG_VIEWMODEL, "Zeige QR-Code für Karte: ID=${card.id}, Name=${card.name}")
         _qrCodeDialogCard.value = card
     }
     
@@ -103,6 +134,7 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
      * Schließt den QR-Code Dialog
      */
     fun dismissQrCode() {
+        Log.d(LogConfig.TAG_VIEWMODEL, "Schließe QR-Code Dialog")
         _qrCodeDialogCard.value = null
     }
     

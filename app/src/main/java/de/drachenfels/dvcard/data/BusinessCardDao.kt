@@ -19,6 +19,12 @@ interface BusinessCardDao {
     fun getAllCards(): Flow<List<BusinessCard>>
     
     /**
+     * Gibt die Anzahl der Karten in der Datenbank zurück.
+     */
+    @Query("SELECT COUNT(*) FROM business_cards")
+    suspend fun getCardCount(): Int
+    
+    /**
      * Sucht eine spezifische Karte anhand der ID.
      */
     @Query("SELECT * FROM business_cards WHERE id = :id")

@@ -4,7 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import de.drachenfels.dvcard.data.model.BusinessCard
+import de.drachenfels.dvcard.util.logger.Log
+import de.drachenfels.dvcard.util.logger.LogConfig
+import java.io.File
 
 /**
  * Room-Datenbank für die App
@@ -28,16 +32,58 @@ abstract class BusinessCardDatabase : RoomDatabase() {
          * bestehende Instanz zurück.
          */
         fun getDatabase(context: Context): BusinessCardDatabase {
+            Log.d(LogConfig.TAG_DATABASE, "getDatabase aufgerufen")
+            
+            val dbFile = context.getDatabasePath("business_card_database")
+            Log.d(LogConfig.TAG_DATABASE, "Datenbank-Pfad: ${dbFile.absolutePath}")
+            
+            // Prüfen, ob die Datenbank existiert
+            val exists = dbFile.exists()
+            Log.d(LogConfig.TAG_DATABASE, "Datenbank existiert: $exists")
+            if (exists) {
+                Log.d(LogConfig.TAG_DATABASE, "Datenbank-Größe: ${dbFile.length()} Bytes")
+            }
+            
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    BusinessCardDatabase::class.java,
-                    "business_card_database"
-                )
-                .fallbackToDestructiveMigration() // Für einfache Schemamigration in der Entwicklung
-                .build()
-                INSTANCE = instance
-                instance
+                Log.d(LogConfig.TAG_DATABASE, "Erstelle neue Datenbankinstanz")
+                try {
+                    val instance = Room.databaseBuilder(
+                        context.applicationContext,
+                        BusinessCardDatabase::class.java,
+                        "business_card_database"
+                    )
+                    .fallbackToDestructiveMigration() // Für einfache Schemamigration in der Entwicklung
+                    .setJournalMode(RoomDatabase.JournalMode.TRUNCATE) // Sofortiges Committen nach Transaktionen
+                    .addCallback(object : Callback() {
+                        override fun onCreate(db: SupportSQLiteDatabase) {
+                            super.onCreate(db)
+                            Log.d(LogConfig.TAG_DATABASE, "Callback: Datenbank erstellt")
+                        }
+                        
+                        override fun onOpen(db: SupportSQLiteDatabase) {
+                            super.onOpen(db)
+                            Log.d(LogConfig.TAG_DATABASE, "Callback: Datenbank geöffnet")
+                            // PRAGMA zum Sicherstellen, dass Daten direkt geschrieben werden
+                            db.execSQL("PRAGMA synchronous = NORMAL")
+                            db.execSQL("PRAGMA journal_mode = TRUNCATE")
+                        }
+                    })
+                    .build()
+                    INSTANCE = instance
+                    Log.d(LogConfig.TAG_DATABASE, "Datenbank-Instanz erfolgreich erstellt")
+                    
+                    // Erneut prüfen, ob die Datei existiert
+                    val nowExists = dbFile.exists()
+                    Log.d(LogConfig.TAG_DATABASE, "Datenbank existiert nach Erstellung: $nowExists")
+                    if (nowExists) {
+                        Log.d(LogConfig.TAG_DATABASE, "Datenbank-Größe nach Erstellung: ${dbFile.length()} Bytes")
+                    }
+                    
+                    instance
+                } catch (e: Exception) {
+                    Log.e(LogConfig.TAG_DATABASE, "Fehler beim Erstellen der Datenbank", e)
+                    throw e
+                }
             }
         }
     }
