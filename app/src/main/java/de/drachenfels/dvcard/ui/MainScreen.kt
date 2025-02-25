@@ -44,11 +44,13 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { 
-                Log.d(LogConfig.TAG_UI, "FAB geklickt - Neue Karte erstellen")
-                viewModel.createNewCard() 
-            }) {
-                Icon(Icons.Filled.Add, contentDescription = "Neue Karte hinzufügen")
+            if (editMode !is BusinessCardViewModel.CardEditState.Creating) {
+                FloatingActionButton(onClick = { 
+                    Log.d(LogConfig.TAG_UI, "FAB geklickt - Neue Karte erstellen")
+                    viewModel.createNewCard() 
+                }) {
+                    Icon(Icons.Filled.Add, contentDescription = "Neue Karte hinzufügen")
+                }
             }
         }
     ) { paddingValues ->
@@ -63,21 +65,22 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                 
                 val scrollState = rememberScrollState()
                 
-                Card(
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
                         .padding(16.dp)
                 ) {
-                    Column(modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxHeight(0.9f) // Begrenzt die Höhe des Cards
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
                     ) {
-                        Text(
-                            text = "Neue Visitenkarte",
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        
-                        Box(modifier = Modifier.weight(1f)) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = "Neue Visitenkarte",
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            
                             de.drachenfels.dvcard.ui.components.CardEditView(
                                 card = selectedCard!!,
                                 onSaveClick = { card -> 

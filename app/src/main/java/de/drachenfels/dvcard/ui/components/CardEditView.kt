@@ -1,8 +1,6 @@
 package de.drachenfels.dvcard.ui.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,8 +41,6 @@ fun CardEditView(
     var isPrivate by remember { mutableStateOf(card.isPrivate) }
     var countryCode by remember { mutableStateOf(card.countryCode) }
     
-    val scrollState = rememberScrollState()
-    
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -52,150 +48,139 @@ fun CardEditView(
     ) {
         Divider(modifier = Modifier.padding(bottom = 16.dp))
         
-        // Scrollbare Inhalte
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .verticalScroll(scrollState)
+        // Eingabefelder
+        OutlinedTextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Name") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        OutlinedTextField(
+            value = position,
+            onValueChange = { position = it },
+            label = { Text("Position") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        OutlinedTextField(
+            value = company,
+            onValueChange = { company = it },
+            label = { Text("Firma") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        OutlinedTextField(
+            value = phone,
+            onValueChange = { phone = it },
+            label = { Text("Telefon") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("E-Mail") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        OutlinedTextField(
+            value = website,
+            onValueChange = { website = it },
+            label = { Text("Webseite") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        
+        // Neue Adressfelder
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Adresse",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
+        
+        OutlinedTextField(
+            value = street,
+            onValueChange = { street = it },
+            label = { Text("Straße und Hausnummer") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Eingabefelder
             OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Name") },
-                modifier = Modifier.fillMaxWidth(),
+                value = postalCode,
+                onValueChange = { postalCode = it },
+                label = { Text("PLZ") },
+                modifier = Modifier.weight(0.4f),
                 singleLine = true
             )
             
-            Spacer(modifier = Modifier.height(8.dp))
-            
             OutlinedTextField(
-                value = position,
-                onValueChange = { position = it },
-                label = { Text("Position") },
-                modifier = Modifier.fillMaxWidth(),
+                value = city,
+                onValueChange = { city = it },
+                label = { Text("Ort") },
+                modifier = Modifier.weight(0.6f),
                 singleLine = true
             )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            OutlinedTextField(
-                value = company,
-                onValueChange = { company = it },
-                label = { Text("Firma") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            OutlinedTextField(
-                value = phone,
-                onValueChange = { phone = it },
-                label = { Text("Telefon") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("E-Mail") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            OutlinedTextField(
-                value = website,
-                onValueChange = { website = it },
-                label = { Text("Webseite") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-            
-            // Neue Adressfelder
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Adresse",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-            
-            OutlinedTextField(
-                value = street,
-                onValueChange = { street = it },
-                label = { Text("Straße und Hausnummer") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedTextField(
-                    value = postalCode,
-                    onValueChange = { postalCode = it },
-                    label = { Text("PLZ") },
-                    modifier = Modifier.weight(0.4f),
-                    singleLine = true
-                )
-                
-                OutlinedTextField(
-                    value = city,
-                    onValueChange = { city = it },
-                    label = { Text("Ort") },
-                    modifier = Modifier.weight(0.6f),
-                    singleLine = true
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            OutlinedTextField(
-                value = country,
-                onValueChange = { country = it },
-                label = { Text("Land") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            OutlinedTextField(
-                value = countryCode,
-                onValueChange = { countryCode = it },
-                label = { Text("Ländercode") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-            
-            // Checkbox für Private/Geschäftliche Karte
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Checkbox(
-                    checked = isPrivate,
-                    onCheckedChange = { isPrivate = it }
-                )
-                Text("Private Karte")
-            }
-            
-            // Abstand zum Ende, damit die Buttons sichtbar sind
-            Spacer(modifier = Modifier.height(16.dp))
         }
         
-        // Aktionsbuttons - immer am unteren Rand sichtbar
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        OutlinedTextField(
+            value = country,
+            onValueChange = { country = it },
+            label = { Text("Land") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        OutlinedTextField(
+            value = countryCode,
+            onValueChange = { countryCode = it },
+            label = { Text("Ländercode") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        
+        // Checkbox für Private/Geschäftliche Karte
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = isPrivate,
+                onCheckedChange = { isPrivate = it }
+            )
+            Text("Private Karte")
+        }
+        
+        // Aktionsbuttons
         Row(
             modifier = Modifier
                 .fillMaxWidth()
