@@ -11,8 +11,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.drachenfels.dvcard.data.model.BusinessCard
+import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
 
 /**
  * Composable für ein einzelnes Visitenkarten-Item in der Liste
@@ -160,6 +162,116 @@ fun CardItem(
                     onCancel = onCancel
                 )
             }
+        }
+    }
+}
+
+// Beispieldaten für Previews
+private val sampleCard = BusinessCard(
+    id = 1,
+    name = "Max Mustermann",
+    position = "Software Developer",
+    company = "Muster GmbH",
+    phone = "+49 123 456789",
+    email = "max@example.com",
+    website = "www.example.com",
+    street = "Musterstraße 123",
+    postalCode = "12345",
+    city = "Musterstadt",
+    country = "Deutschland",
+    isPrivate = false
+)
+
+private val privateCard = BusinessCard(
+    id = 2,
+    name = "Erika Mustermann",
+    position = "",
+    company = "",
+    phone = "+49 987 654321",
+    email = "erika@example.com",
+    website = "",
+    street = "Privatweg 42",
+    postalCode = "54321",
+    city = "Beispielstadt",
+    country = "Deutschland",
+    isPrivate = true
+)
+
+private val minimalCard = BusinessCard(
+    id = 3,
+    name = "John Doe",
+    phone = "+49 555 123456",
+    email = "john@example.com"
+)
+
+@Preview(showBackground = true)
+@Composable
+fun CardItemPreview() {
+    DigtalBusinessCardTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            CardItem(
+                card = sampleCard,
+                isExpanded = false,
+                onEditClick = {},
+                onQrCodeClick = {},
+                onSaveClick = {},
+                onDeleteClick = {},
+                onCancel = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Expanded Card")
+@Composable
+fun ExpandedCardItemPreview() {
+    DigtalBusinessCardTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            CardItem(
+                card = sampleCard,
+                isExpanded = true,
+                onEditClick = {},
+                onQrCodeClick = {},
+                onSaveClick = {},
+                onDeleteClick = {},
+                onCancel = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Private Card")
+@Composable
+fun PrivateCardItemPreview() {
+    DigtalBusinessCardTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            CardItem(
+                card = privateCard,
+                isExpanded = false,
+                onEditClick = {},
+                onQrCodeClick = {},
+                onSaveClick = {},
+                onDeleteClick = {},
+                onCancel = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Minimal Card")
+@Composable
+fun MinimalCardItemPreview() {
+    DigtalBusinessCardTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            CardItem(
+                card = minimalCard,
+                isExpanded = false,
+                onEditClick = {},
+                onQrCodeClick = {},
+                onSaveClick = {},
+                onDeleteClick = {},
+                onCancel = {}
+            )
         }
     }
 }

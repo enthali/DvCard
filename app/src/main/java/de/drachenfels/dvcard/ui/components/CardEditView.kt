@@ -5,8 +5,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.drachenfels.dvcard.data.model.BusinessCard
+import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
 import de.drachenfels.dvcard.util.logger.Log
 import de.drachenfels.dvcard.util.logger.LogConfig
 
@@ -218,6 +220,76 @@ fun CardEditView(
             ) {
                 Text("Speichern")
             }
+        }
+    }
+}
+
+// Beispieldaten für Preview
+private val sampleCard = BusinessCard(
+    id = 1,
+    name = "Max Mustermann",
+    position = "Software Developer",
+    company = "Muster GmbH",
+    phone = "+49 123 456789",
+    email = "max@example.com",
+    website = "www.example.com",
+    street = "Musterstraße 123",
+    postalCode = "12345",
+    city = "Musterstadt",
+    country = "Deutschland",
+    isPrivate = false
+)
+
+@Preview(showBackground = true)
+@Composable
+fun CardEditViewPreview() {
+    DigtalBusinessCardTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            CardEditView(
+                card = sampleCard,
+                onSaveClick = {},
+                onDeleteClick = {},
+                onCancel = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Neue Karte")
+@Composable
+fun NewCardEditViewPreview() {
+    DigtalBusinessCardTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            CardEditView(
+                card = BusinessCard(), // Leere Karte
+                onSaveClick = {},
+                onDeleteClick = null, // Keine Löschfunktion
+                onCancel = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Private Karte")
+@Composable
+fun PrivateCardEditViewPreview() {
+    DigtalBusinessCardTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.background,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            CardEditView(
+                card = sampleCard.copy(isPrivate = true),
+                onSaveClick = {},
+                onDeleteClick = {},
+                onCancel = {}
+            )
         }
     }
 }
