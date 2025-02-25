@@ -39,14 +39,13 @@ fun CardEditView(
     var country by remember { mutableStateOf(card.country) }
     
     var isPrivate by remember { mutableStateOf(card.isPrivate) }
-    var countryCode by remember { mutableStateOf(card.countryCode) }
     
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 16.dp)
     ) {
-        Divider(modifier = Modifier.padding(bottom = 16.dp))
+        HorizontalDivider(modifier = Modifier.padding(bottom = 16.dp))
         
         // Eingabefelder
         OutlinedTextField(
@@ -156,16 +155,6 @@ fun CardEditView(
             singleLine = true
         )
         
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        OutlinedTextField(
-            value = countryCode,
-            onValueChange = { countryCode = it },
-            label = { Text("Ländercode") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-        
         // Checkbox für Private/Geschäftliche Karte
         Row(
             modifier = Modifier
@@ -221,8 +210,7 @@ fun CardEditView(
                             postalCode = postalCode,
                             city = city,
                             country = country,
-                            isPrivate = isPrivate,
-                            countryCode = countryCode
+                            isPrivate = isPrivate
                         )
                     )
                 },

@@ -26,6 +26,5 @@ data class BusinessCard(
     val city: String = "",
     val country: String = "",
     
-    val isPrivate: Boolean = false,
-    val countryCode: String = ""
+    val isPrivate: Boolean = false
 )
