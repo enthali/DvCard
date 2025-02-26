@@ -1,5 +1,6 @@
 package de.drachenfels.dvcard.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.drachenfels.dvcard.data.model.BusinessCard
+import de.drachenfels.dvcard.ui.components.AboutDialog
 import de.drachenfels.dvcard.ui.components.CardItem
 import de.drachenfels.dvcard.ui.components.QrCodeDialog
 import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
@@ -38,12 +40,23 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
     val selectedCard by viewModel.selectedCard.collectAsState()
     val qrCodeCard by viewModel.qrCodeDialogCard.collectAsState()
     
+    // State für den About-Dialog
+    var showAboutDialog by remember { mutableStateOf(false) }
+    
     Log.d(LogConfig.TAG_UI, "MainScreen State: cards=${cards.size}, editMode=$editMode, selectedCard=${selectedCard?.id}")
     
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("DvCard - Digitale Visitenkarten") }
+                title = { 
+                    Text(
+                        text = "Digitale Visitenkarte",
+                        modifier = Modifier.clickable { 
+                            Log.d(LogConfig.TAG_UI, "App-Titel geklickt - Zeige About-Dialog")
+                            showAboutDialog = true 
+                        }
+                    ) 
+                }
             )
         },
         floatingActionButton = {
@@ -163,6 +176,17 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                 onDismiss = { 
                     Log.d(LogConfig.TAG_UI, "QR-Code-Dialog geschlossen")
                     viewModel.dismissQrCode() 
+                }
+            )
+        }
+        
+        // About-Dialog anzeigen, wenn auf den App-Titel geklickt wurde
+        if (showAboutDialog) {
+            Log.d(LogConfig.TAG_UI, "Zeige About-Dialog")
+            AboutDialog(
+                onDismiss = { 
+                    Log.d(LogConfig.TAG_UI, "About-Dialog geschlossen")
+                    showAboutDialog = false 
                 }
             )
         }

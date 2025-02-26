@@ -3,57 +3,70 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    
-    <!-- Business Card Shape with rounded corners -->
-    <path 
-        android:fillColor="#FFFFFF"
-        android:pathData="M18,32 L90,32 A4,4 0 0 1 94,36 L94,72 A4,4 0 0 1 90,76 L18,76 A4,4 0 0 1 14,72 L14,36 A4,4 0 0 1 18,32 z" />
-    
-    <!-- QR Code - Bottom right corner with rounded corners -->
     <path
         android:fillColor="#3498db"
-        android:pathData="M63,44 L84,44 A2,2 0 0 1 86,46 L86,68 A2,2 0 0 1 84,70 L63,70 A2,2 0 0 1 61,68 L61,46 A2,2 0 0 1 63,44 z" />
+        android:pathData="M0,0h108v108h-108z" />
+    <!-- Business Card Shape with rounded corners -->
+    <path 
+        android:fillColor="#00000000"
+        android:strokeColor="#ffffff"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M18,32 L90,32 A4,4 0 0 1 94,36 L94,72 A4,4 0 0 1 90,76 L18,76 A4,4 0 0 1 14,72 L14,36 A4,4 0 0 1 18,32 z" />
+
+    <path
+        android:strokeColor="#ffffff"
+        android:strokeWidth="9"
+        android:pathData="M17,39 L92,39"/>
+    <path
+        android:strokeColor="#ffffff"
+        android:strokeWidth="6"
+        android:pathData="M17,51 L60,51"/>
+    <path
+        android:strokeColor="#ffffff"
+        android:strokeWidth="6"
+        android:pathData="M17,61 L60,61"/>
+    <path
+        android:strokeColor="#ffffff"
+        android:strokeWidth="6"
+        android:pathData="M17,71 L60,71"/>
+    <path
+        android:strokeColor="#ffffff"
+        android:strokeWidth="6"
+        android:pathData="M58 ,39 L58,75"/>
+    <path
+        android:strokeColor="#ffffff"
+        android:strokeWidth="6"
+        android:pathData="M53 ,49 L53,75"/>
+
 
     <!-- QR Code finder patterns - Top Left -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M63,47h9v9h-9z" />
-    <path
-        android:fillColor="#3498db"
-        android:pathData="M65,49h5v5h-5z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M79,58h3v5h-3z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M77,65h6v3h-6z" />
+        android:fillColor="#00000000"
+        android:strokeColor="#ffffff"
+        android:strokeWidth="2"
+        android:pathData="M65,47h8v8h-8z" />
+
     
     <!-- QR Code finder patterns - Bottom Left -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M63,59h9v9h-9z" />
-    <path
-        android:fillColor="#3498db"
-        android:pathData="M65,61h5v5h-5z" />
+        android:fillColor="#00000000"
+        android:strokeColor="#ffffff"
+        android:strokeWidth="2"
+        android:pathData="M65,61h8v8h-8z" />
     
     <!-- QR Code finder patterns - Top Right -->
     <path
+        android:fillColor="#00000000"
+        android:strokeColor="#ffffff"
+        android:strokeWidth="2"
+        android:pathData="M79,47h8v8h-8z" />
+
+    <path
         android:fillColor="#FFFFFF"
-        android:pathData="M75,47h9v9h-9z" />
+        android:pathData="M80,59h3v5h-3z" />
     <path
-        android:fillColor="#3498db"
-        android:pathData="M77,49h5v5h-5z" />
-    
-    <!-- Blue lines with rounded caps -->
-    <path
-        android:fillColor="#3498db"
-        android:pathData="M24,44 L54,44 A2,2 0 0 1 56,46 L56,46 A2,2 0 0 1 54,48 L24,48 A2,2 0 0 1 22,46 L22,46 A2,2 0 0 1 24,44 z" />
-    
-    <path
-        android:fillColor="#3498db"
-        android:pathData="M24,54 L50,54 A2,2 0 0 1 52,56 L52,56 A2,2 0 0 1 50,58 L24,58 A2,2 0 0 1 22,56 L22,56 A2,2 0 0 1 24,54 z" />
-    
-    <path
-        android:fillColor="#3498db"
-        android:pathData="M24,64 L46,64 A2,2 0 0 1 48,66 L48,66 A2,2 0 0 1 46,68 L24,68 A2,2 0 0 1 22,66 L22,66 A2,2 0 0 1 24,64 z" />
-</vector>
+        android:fillColor="#FFFFFF"
+        android:pathData="M82,67h6v3h-6z" />
+ </vector>

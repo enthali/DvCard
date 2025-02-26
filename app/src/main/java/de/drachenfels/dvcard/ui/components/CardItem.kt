@@ -133,7 +133,12 @@ fun CardItem(
                 }
                 
                 // Aktions-Buttons (wie bisher)
-                Row {
+                Column (
+                    modifier = Modifier
+                        .height(IntrinsicSize.Min) // Match the height of the parent
+                        .wrapContentWidth(), // Only take up the width needed
+                        verticalArrangement = Arrangement.SpaceBetween // Distribute items with space between
+                             ){
                     IconButton(onClick = onEditClick) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
