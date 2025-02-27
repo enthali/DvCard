@@ -3,6 +3,7 @@ package de.drachenfels.dvcard.ui.components
 import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -10,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -25,25 +27,37 @@ import de.drachenfels.dvcard.util.generateVCardQrCode
  */
 @Composable
 fun QrCodeDialog(card: BusinessCard, onDismiss: () -> Unit) {
+    // Bestimme den Anzeigetitel (verwende Titel wenn vorhanden, sonst den Namen)
+    val displayTitle = if (card.title.isNotEmpty()) card.title else card.name
+    
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
+                // Gesamter Dialog ist klickbar, um zu schließen
+                .clickable { onDismiss() },
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Titel mit verbesserter Textdarstellung
                 Text(
-                    text = "QR-Code für ${card.name}",
-                    style = MaterialTheme.typography.headlineSmall
+                    text = "Digitale Visitenkarte",
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center
                 )
                 
-                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = displayTitle,
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
+                )
                 
                 // QR-Code-Bild generieren und anzeigen
-                // Für Previews verwenden wir ein simuliertes Bitmap
                 val isPreview = LocalInspectionMode.current
                 val qrBitmap = if (isPreview) {
                     // Mock-Bitmap für Preview
@@ -53,29 +67,39 @@ fun QrCodeDialog(card: BusinessCard, onDismiss: () -> Unit) {
                     generateVCardQrCode(card)
                 }
                 
-                Image(
-                    bitmap = qrBitmap.asImageBitmap(),
-                    contentDescription = "QR-Code für ${card.name}",
-                    modifier = Modifier.size(256.dp)
-                )
+                // Box mit einem dezenten Schatten für den QR-Code
+                Surface(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(260.dp),
+                    shadowElevation = 2.dp,
+                    tonalElevation = 1.dp,
+                ) {
+                    Image(
+                        bitmap = qrBitmap.asImageBitmap(),
+                        contentDescription = "QR-Code für ${displayTitle}",
+                        modifier = Modifier.size(256.dp).padding(2.dp)
+                    )
+                }
                 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 
-                // Hinweistext
+                // Hinweistext zum QR-Code scannen
                 Text(
                     text = "Scannen Sie diesen Code, um die Kontaktdaten zu importieren.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
                 )
                 
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                Button(
-                    onClick = onDismiss,
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Text("Schließen")
-                }
+                // Neuer Hinweistext zum Schließen
+                Text(
+                    text = "Tippen zum Schließen",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 16.dp)
+                )
             }
         }
     }
@@ -124,6 +148,7 @@ private fun createMockQrBitmap(size: Int): Bitmap {
 // Beispieldaten für Preview
 private val sampleCard = BusinessCard(
     id = 1,
+    title = "Geschäftskarte",
     name = "Max Mustermann",
     position = "Software Developer",
     company = "Muster GmbH",
@@ -137,6 +162,16 @@ private val sampleCard = BusinessCard(
     isPrivate = false
 )
 
+private val sampleCardNoTitle = BusinessCard(
+    id = 2,
+    title = "",
+    name = "Max Mustermann",
+    position = "Software Developer",
+    company = "Muster GmbH",
+    phone = "+49 123 456789",
+    email = "max@example.com"
+)
+
 @Preview(showBackground = true)
 @Composable
 fun QrCodeDialogPreview() {
@@ -147,42 +182,124 @@ fun QrCodeDialogPreview() {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Titel mit verbesserter Textdarstellung
+                    Text(
+                        text = "Digitale Visitenkarte",
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center
+                    )
+                    
+                    Text(
+                        text = if (sampleCard.title.isNotEmpty()) sampleCard.title else sampleCard.name,
+                        style = MaterialTheme.typography.headlineSmall,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
+                    )
+                    
+                    // Box mit einem dezenten Schatten für den QR-Code
+                    Surface(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .size(260.dp),
+                        shadowElevation = 2.dp,
+                        tonalElevation = 1.dp,
+                    ) {
+                        Image(
+                            bitmap = createMockQrBitmap(256).asImageBitmap(),
+                            contentDescription = "QR-Code für ${sampleCard.name}",
+                            modifier = Modifier.size(256.dp).padding(2.dp)
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    Text(
+                        text = "Scannen Sie diesen Code, um die Kontaktdaten zu importieren.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
+                    )
+                    
+                    // Neuer Hinweistext zum Schließen
+                    Text(
+                        text = "Tippen zum Schließen",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "QR Code ohne Titel")
+@Composable
+fun QrCodeDialogNoTitlePreview() {
+    DigtalBusinessCardTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "QR-Code für ${sampleCard.name}",
-                        style = MaterialTheme.typography.headlineSmall
+                        text = "Digitale Visitenkarte",
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center
                     )
                     
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Mock-QR-Code für Preview
-                    Image(
-                        bitmap = createMockQrBitmap(256).asImageBitmap(),
-                        contentDescription = "QR-Code für ${sampleCard.name}",
-                        modifier = Modifier.size(256.dp)
+                    Text(
+                        text = sampleCardNoTitle.name,
+                        style = MaterialTheme.typography.headlineSmall,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
                     )
                     
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Surface(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .size(260.dp),
+                        shadowElevation = 2.dp,
+                        tonalElevation = 1.dp,
+                    ) {
+                        Image(
+                            bitmap = createMockQrBitmap(256).asImageBitmap(),
+                            contentDescription = "QR-Code für ${sampleCardNoTitle.name}",
+                            modifier = Modifier.size(256.dp).padding(2.dp)
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
                     
                     Text(
                         text = "Scannen Sie diesen Code, um die Kontaktdaten zu importieren.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center
                     )
                     
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    Button(
-                        onClick = { /* Dummy-Callback */ },
-                        modifier = Modifier.align(Alignment.End)
-                    ) {
-                        Text("Schließen")
-                    }
+                    // Neuer Hinweistext zum Schließen
+                    Text(
+                        text = "Tippen zum Schließen",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
                 }
             }
         }

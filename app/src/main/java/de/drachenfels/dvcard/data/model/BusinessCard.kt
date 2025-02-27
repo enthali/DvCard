@@ -14,6 +14,7 @@ data class BusinessCard(
     @PrimaryKey(autoGenerate = true) 
     val id: Long = 0,
     
+    val title: String = "", // Neues Feld für den Titel der Karte
     val name: String = "",
     val position: String = "",
     val company: String = "",

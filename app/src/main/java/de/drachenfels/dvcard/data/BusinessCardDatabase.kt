@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import de.drachenfels.dvcard.data.model.BusinessCard
 import de.drachenfels.dvcard.util.logger.Log
@@ -11,11 +12,23 @@ import de.drachenfels.dvcard.util.logger.LogConfig
 import java.io.File
 
 /**
+ * Migration von Version 1 zu Version 2
+ * 
+ * Fügt das neue 'title'-Feld zur business_cards-Tabelle hinzu
+ */
+private val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        // Fügt die neue Spalte 'title' mit Standardwert '' hinzu
+        database.execSQL("ALTER TABLE business_cards ADD COLUMN title TEXT NOT NULL DEFAULT ''")
+    }
+}
+
+/**
  * Room-Datenbank für die App
  *
  * Zentrale Datenbank, die alle Visitenkarten speichert.
  */
-@Database(entities = [BusinessCard::class], version = 1, exportSchema = false)
+@Database(entities = [BusinessCard::class], version = 2, exportSchema = false)
 abstract class BusinessCardDatabase : RoomDatabase() {
     /**
      * Liefert das DAO für den Zugriff auf die Visitenkarten.
@@ -52,7 +65,10 @@ abstract class BusinessCardDatabase : RoomDatabase() {
                         BusinessCardDatabase::class.java,
                         "business_card_database"
                     )
-                    .fallbackToDestructiveMigration() // Für einfache Schemamigration in der Entwicklung
+                    // Migration hinzufügen, um bestehende Daten zu erhalten
+                    .addMigrations(MIGRATION_1_2)
+                    // Fallback nur als letzte Option
+                    .fallbackToDestructiveMigration()
                     .setJournalMode(RoomDatabase.JournalMode.TRUNCATE) // Sofortiges Committen nach Transaktionen
                     .addCallback(object : Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
