@@ -3,6 +3,7 @@ package de.drachenfels.dvcard.ui.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -11,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.drachenfels.dvcard.data.model.BusinessCard
@@ -41,131 +43,159 @@ fun CardItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
+            .clickable(onClick = onQrCodeClick), // Ganze Karte klickbar für QR-Code
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            // Kompakte Kartenansicht
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top // Oben ausrichten
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    // Name, Position, Firma (wie bisher)
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    // Kartentyp (Privat/Geschäftlich) vor dem Titel
                     Text(
-                        text = card.name,
-                        style = MaterialTheme.typography.titleLarge
+                        text = if (card.isPrivate) "Privat" else "Geschäftlich",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = if (card.isPrivate) 
+                            MaterialTheme.colorScheme.secondary 
+                        else 
+                            MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
                     )
-                    if (card.position.isNotEmpty()) {
-                        Text(
-                            text = card.position,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                    if (card.company.isNotEmpty()) {
-                        Text(
-                            text = card.company,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
                     
-                    // Kontaktdaten hinzufügen
-                    if (card.phone.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "Tel: ${card.phone}",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                    
-                    if (card.email.isNotEmpty()) {
-                        Text(
-                            text = "E-Mail: ${card.email}",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                    
-                    // Adressdaten hinzufügen
-                    if (card.street.isNotEmpty() || card.city.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        
-                        if (card.street.isNotEmpty()) {
+                    // Kompakte Kartenansicht
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            // Titel oder Name, je nachdem was gesetzt ist
+                            val displayTitle = if (card.title.isNotEmpty()) card.title else card.name
                             Text(
-                                text = card.street,
-                                style = MaterialTheme.typography.bodySmall
+                                text = displayTitle,
+                                style = MaterialTheme.typography.titleLarge
                             )
-                        }
-                        
-                        val locationText = buildString {
-                            if (card.postalCode.isNotEmpty()) {
-                                append(card.postalCode)
-                                append(" ")
+                            
+                            // Wenn ein Titel gesetzt ist, zeigen wir auch den Namen an
+                            if (card.title.isNotEmpty()) {
+                                Text(
+                                    text = card.name,
+                                    style = MaterialTheme.typography.titleMedium
+                                )
                             }
-                            if (card.city.isNotEmpty()) {
-                                append(card.city)
+                            
+                            if (card.position.isNotEmpty()) {
+                                Text(
+                                    text = card.position,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                            if (card.company.isNotEmpty()) {
+                                Text(
+                                    text = card.company,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                            
+                            // Kontaktdaten
+                            if (card.phone.isNotEmpty() || card.email.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                            
+                            if (card.phone.isNotEmpty()) {
+                                Text(
+                                    text = "Tel: ${card.phone}",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                            
+                            if (card.email.isNotEmpty()) {
+                                Text(
+                                    text = "E-Mail: ${card.email}",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                            
+                            // Adressdaten
+                            if (card.street.isNotEmpty() || card.city.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                
+                                if (card.street.isNotEmpty()) {
+                                    Text(
+                                        text = card.street,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                                
+                                val locationText = buildString {
+                                    if (card.postalCode.isNotEmpty()) {
+                                        append(card.postalCode)
+                                        append(" ")
+                                    }
+                                    if (card.city.isNotEmpty()) {
+                                        append(card.city)
+                                    }
+                                }
+                                
+                                if (locationText.isNotEmpty()) {
+                                    Text(
+                                        text = locationText,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                                
+                                if (card.country.isNotEmpty()) {
+                                    Text(
+                                        text = card.country,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
                             }
                         }
                         
-                        if (locationText.isNotEmpty()) {
-                            Text(
-                                text = locationText,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
-                        
-                        if (card.country.isNotEmpty()) {
-                            Text(
-                                text = card.country,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
-                    }
-                    
-                    // Zusätzliche Info für private Karten oder Ländercodes (wie bisher)
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (card.isPrivate) {
-                            Text(
-                                text = "Privat",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.secondary
+                        // Bearbeiten-Button (nur noch dieser oben rechts)
+                        IconButton(onClick = onEditClick) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "Karte bearbeiten"
                             )
                         }
                     }
                 }
                 
-                // Aktions-Buttons (wie bisher)
-                Column (
+                // QR-Code Icon unten rechts
+                Box(
                     modifier = Modifier
-                        .height(IntrinsicSize.Min) // Match the height of the parent
-                        .wrapContentWidth(), // Only take up the width needed
-                        verticalArrangement = Arrangement.SpaceBetween // Distribute items with space between
-                             ){
-                    IconButton(onClick = onEditClick) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Karte bearbeiten"
-                        )
-                    }
-                    IconButton(onClick = onQrCodeClick) {
-                        Icon(
-                            imageVector = Icons.Default.QrCode,
-                            contentDescription = "QR-Code anzeigen"
-                        )
-                    }
+                        .align(Alignment.BottomEnd)
+                        .padding(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.QrCode,
+                        contentDescription = "QR-Code anzeigen",
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                        modifier = Modifier.size(32.dp)
+                    )
                 }
             }
             
-            // Erweiterter Bearbeitungsbereich (wie bisher)
+            // Erweiterter Bearbeitungsbereich mit AnimatedVisibility
             AnimatedVisibility(
                 visible = isExpanded,
                 enter = expandVertically(),
                 exit = shrinkVertically()
             ) {
-                CardEditView(
-                    card = card,
-                    onSaveClick = onSaveClick,
-                    onDeleteClick = onDeleteClick,
-                    onCancel = onCancel
-                )
+                // Verwenden Sie ein extra Layout, um den CardEditView zu umschließen
+                Surface(
+                    color = MaterialTheme.colorScheme.surface,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    CardEditView(
+                        card = card,
+                        onSaveClick = onSaveClick,
+                        onDeleteClick = onDeleteClick,
+                        onCancel = onCancel
+                    )
+                }
             }
         }
     }
@@ -174,6 +204,7 @@ fun CardItem(
 // Beispieldaten für Previews
 private val sampleCard = BusinessCard(
     id = 1,
+    title = "Geschäftskarte",
     name = "Max Mustermann",
     position = "Software Developer",
     company = "Muster GmbH",
@@ -189,6 +220,7 @@ private val sampleCard = BusinessCard(
 
 private val privateCard = BusinessCard(
     id = 2,
+    title = "Meine Privatkarte",
     name = "Erika Mustermann",
     position = "",
     company = "",
@@ -204,6 +236,7 @@ private val privateCard = BusinessCard(
 
 private val minimalCard = BusinessCard(
     id = 3,
+    title = "",
     name = "John Doe",
     phone = "+49 555 123456",
     email = "john@example.com"
@@ -216,6 +249,24 @@ fun CardItemPreview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             CardItem(
                 card = sampleCard,
+                isExpanded = false,
+                onEditClick = {},
+                onQrCodeClick = {},
+                onSaveClick = {},
+                onDeleteClick = {},
+                onCancel = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Card ohne Titel")
+@Composable
+fun CardItemNoTitlePreview() {
+    DigtalBusinessCardTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            CardItem(
+                card = minimalCard,
                 isExpanded = false,
                 onEditClick = {},
                 onQrCodeClick = {},
@@ -252,24 +303,6 @@ fun PrivateCardItemPreview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             CardItem(
                 card = privateCard,
-                isExpanded = false,
-                onEditClick = {},
-                onQrCodeClick = {},
-                onSaveClick = {},
-                onDeleteClick = {},
-                onCancel = {}
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, name = "Minimal Card")
-@Composable
-fun MinimalCardItemPreview() {
-    DigtalBusinessCardTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            CardItem(
-                card = minimalCard,
                 isExpanded = false,
                 onEditClick = {},
                 onQrCodeClick = {},

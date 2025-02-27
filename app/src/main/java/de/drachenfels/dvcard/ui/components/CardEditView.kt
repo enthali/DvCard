@@ -1,6 +1,7 @@
 package de.drachenfels.dvcard.ui.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,6 +29,7 @@ fun CardEditView(
     onDeleteClick: (() -> Unit)?,
     onCancel: () -> Unit
 ) {
+    var title by remember { mutableStateOf(card.title) }
     var name by remember { mutableStateOf(card.name) }
     var position by remember { mutableStateOf(card.position) }
     var company by remember { mutableStateOf(card.company) }
@@ -49,7 +51,60 @@ fun CardEditView(
     ) {
         HorizontalDivider(modifier = Modifier.padding(bottom = 16.dp))
         
+        // Kartentyp-Auswahl mit Segmented Control
+        Text(
+            text = "Kartentyp",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        
+        // Segmented Control für Kartentyp
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .selectableGroup()
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Geschäftlich Button
+            OutlinedButton(
+                onClick = { isPrivate = false },
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = if (!isPrivate) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
+                    contentColor = if (!isPrivate) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                ),
+                border = if (!isPrivate) null else ButtonDefaults.outlinedButtonBorder(enabled = true)
+            ) {
+                Text("Geschäftlich")
+            }
+            
+            // Privat Button
+            OutlinedButton(
+                onClick = { isPrivate = true },
+                modifier = Modifier.weight(1f),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = if (isPrivate) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
+                    contentColor = if (isPrivate) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                ),
+                border = if (isPrivate) null else ButtonDefaults.outlinedButtonBorder(enabled = true)
+            ) {
+                Text("Privat")
+            }
+        }
+        
         // Eingabefelder
+        OutlinedTextField(
+            value = title,
+            onValueChange = { title = it },
+            label = { Text("Titel der Karte") },
+            placeholder = { Text("Optional - wird statt Name angezeigt, wenn gesetzt") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
@@ -157,20 +212,6 @@ fun CardEditView(
             singleLine = true
         )
         
-        // Checkbox für Private/Geschäftliche Karte
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Checkbox(
-                checked = isPrivate,
-                onCheckedChange = { isPrivate = it }
-            )
-            Text("Private Karte")
-        }
-        
         // Aktionsbuttons
         Row(
             modifier = Modifier
@@ -202,6 +243,7 @@ fun CardEditView(
                     Log.d(LogConfig.TAG_UI, "Speichere Karte: ${card.id}")
                     onSaveClick(
                         card.copy(
+                            title = title,
                             name = name,
                             position = position,
                             company = company,
@@ -227,6 +269,7 @@ fun CardEditView(
 // Beispieldaten für Preview
 private val sampleCard = BusinessCard(
     id = 1,
+    title = "Geschäftskarte",
     name = "Max Mustermann",
     position = "Software Developer",
     company = "Muster GmbH",
