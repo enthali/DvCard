@@ -24,11 +24,23 @@ private val MIGRATION_1_2 = object : Migration(1, 2) {
 }
 
 /**
+ * Migration von Version 2 zu Version 3
+ *
+ * Fügt das 'isExpanded'-Feld zur business_cards-Tabelle hinzu
+ */
+private val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        // Fügt die neue Spalte 'isExpanded' mit Standardwert 0 (false) hinzu
+        database.execSQL("ALTER TABLE business_cards ADD COLUMN isExpanded INTEGER NOT NULL DEFAULT 0")
+    }
+}
+
+/**
  * Room-Datenbank für die App
  *
  * Zentrale Datenbank, die alle Visitenkarten speichert.
  */
-@Database(entities = [BusinessCard::class], version = 2, exportSchema = false)
+@Database(entities = [BusinessCard::class], version = 3, exportSchema = false)
 abstract class BusinessCardDatabase : RoomDatabase() {
     /**
      * Liefert das DAO für den Zugriff auf die Visitenkarten.
@@ -67,6 +79,7 @@ abstract class BusinessCardDatabase : RoomDatabase() {
                     )
                     // Migration hinzufügen, um bestehende Daten zu erhalten
                     .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_2_3)
                     // Fallback nur als letzte Option
                     .fallbackToDestructiveMigration()
                     .setJournalMode(RoomDatabase.JournalMode.TRUNCATE) // Sofortiges Committen nach Transaktionen

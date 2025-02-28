@@ -25,9 +25,8 @@ import de.drachenfels.dvcard.util.logger.LogConfig
 @Composable
 fun CardEditView(
     card: BusinessCard,
-    onSaveClick: ((BusinessCard) -> Unit)?, // optional save button
-    onDeleteClick: (() -> Unit)?, // optional delete button
-    onCancel: (() -> Unit)? // optional cancel button
+    onDeleteClick: () -> Unit,
+    onChange: (BusinessCard) -> Unit // Generischer Callback
 ) {
     // Hier müssen wir card als Key für remember verwenden, damit die Werte
     // aktualisiert werden, wenn eine neue Karte angezeigt wird
@@ -94,6 +93,7 @@ fun CardEditView(
                 border = if (!isPrivate) null else ButtonDefaults.outlinedButtonBorder(enabled = true)
             ) {
                 Text("Geschäftlich")
+                onChange(card.copy(isPrivate = isPrivate))
             }
 
             // Privat Button
@@ -107,13 +107,14 @@ fun CardEditView(
                 border = if (isPrivate) null else ButtonDefaults.outlinedButtonBorder(enabled = true)
             ) {
                 Text("Privat")
+                onChange(card.copy(isPrivate = isPrivate))
             }
         }
 
         // Eingabefelder
         OutlinedTextField(
             value = title,
-            onValueChange = { title = it },
+            onValueChange = {onChange(card.copy(title = it))},
             label = { Text("Titel der Karte") },
             placeholder = { Text("Optional - wird statt Name angezeigt, wenn gesetzt") },
             modifier = Modifier.fillMaxWidth(),
@@ -124,7 +125,7 @@ fun CardEditView(
 
         OutlinedTextField(
             value = name,
-            onValueChange = { name = it },
+            onValueChange = { onChange(card.copy(name = it)) },
             label = { Text("Name") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
@@ -134,7 +135,7 @@ fun CardEditView(
 
         OutlinedTextField(
             value = position,
-            onValueChange = { position = it },
+            onValueChange = { onChange(card.copy(position = it)) },
             label = { Text("Position") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
@@ -144,7 +145,7 @@ fun CardEditView(
 
         OutlinedTextField(
             value = company,
-            onValueChange = { company = it },
+            onValueChange = { onChange(card.copy(company = it))  },
             label = { Text("Firma") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
@@ -154,7 +155,7 @@ fun CardEditView(
 
         OutlinedTextField(
             value = phone,
-            onValueChange = { phone = it },
+            onValueChange = { onChange(card.copy(phone = it)) },
             label = { Text("Telefon") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
@@ -164,7 +165,7 @@ fun CardEditView(
 
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = { onChange(card.copy(email = it))   },
             label = { Text("E-Mail") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
@@ -174,7 +175,7 @@ fun CardEditView(
 
         OutlinedTextField(
             value = website,
-            onValueChange = { website = it },
+            onValueChange = { onChange(card.copy(website = it))   },
             label = { Text("Webseite") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
@@ -190,7 +191,7 @@ fun CardEditView(
 
         OutlinedTextField(
             value = street,
-            onValueChange = { street = it },
+            onValueChange = { onChange(card.copy(street = it))  },
             label = { Text("Straße und Hausnummer") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
@@ -204,7 +205,7 @@ fun CardEditView(
         ) {
             OutlinedTextField(
                 value = postalCode,
-                onValueChange = { postalCode = it },
+                onValueChange = { onChange(card.copy(postalCode = it)) },
                 label = { Text("PLZ") },
                 modifier = Modifier.weight(0.4f),
                 singleLine = true
@@ -212,7 +213,7 @@ fun CardEditView(
 
             OutlinedTextField(
                 value = city,
-                onValueChange = { city = it },
+                onValueChange = { onChange(card.copy(city = it)) },
                 label = { Text("Ort") },
                 modifier = Modifier.weight(0.6f),
                 singleLine = true
@@ -223,7 +224,7 @@ fun CardEditView(
 
         OutlinedTextField(
             value = country,
-            onValueChange = { country = it },
+            onValueChange = { onChange(card.copy(country = it)) },
             label = { Text("Land") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
@@ -244,17 +245,6 @@ fun CardEditView(
                     )
                 ) {
                     Text("Löschen")
-                }
-            }
-
-            if (onSaveClick != null){
-                Button(
-                    onClick = {
-                        Log.d(LogConfig.TAG_UI, "Speichere Karte: ${card.id}")
-                        onSaveClick(createUpdatedCard())
-                    }
-                ) {
-                    Text("Speichern")
                 }
             }
         }
@@ -288,9 +278,8 @@ fun CardEditViewPreview() {
         ) {
             CardEditView(
                 card = sampleCard,
-                onSaveClick = {},
                 onDeleteClick = {},
-                onCancel = null
+                onChange = {}
             )
         }
     }
@@ -306,9 +295,8 @@ fun NewCardEditViewPreview() {
         ) {
             CardEditView(
                 card = BusinessCard(), // Leere Karte
-                onSaveClick = null,
                 onDeleteClick = {},
-                onCancel = null
+                onChange = {}
             )
         }
     }
@@ -324,9 +312,8 @@ fun PrivateCardEditViewPreview() {
         ) {
             CardEditView(
                 card = sampleCard.copy(isPrivate = true),
-                onSaveClick = {},
                 onDeleteClick = {},
-                onCancel = null
+                onChange = {}
             )
         }
     }

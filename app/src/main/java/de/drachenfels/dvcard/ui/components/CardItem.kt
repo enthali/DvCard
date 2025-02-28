@@ -36,16 +36,11 @@ import de.drachenfels.dvcard.util.logger.LogConfig
 @Composable
 fun CardItem(
     card: BusinessCard,
-    isNewCard: Boolean = false,
-    onExpandClick: () -> Unit,
-    onCollapseClick: (BusinessCard) -> Unit,
     onQrCodeClick: () -> Unit,
-    onSaveClick: (BusinessCard) -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    onChange: (BusinessCard) -> Unit // Einheitlicher Callback
 ) {
-    // Interner State für expanded status - initial auf true setzen für neue Karten
-    var isExpanded by remember { mutableStateOf(isNewCard) }
-    
+
     // Speichern des Zustands der bearbeiteten Karte
     var editedCard by remember(card) { mutableStateOf(card) }
 
@@ -183,20 +178,10 @@ fun CardItem(
 
             // Unterer Bereich mit Pfeil und horizontalen Linien
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 8.dp)
-                    .clickable {
-                        if (isExpanded) {
-                            // Beim Einklappen die bearbeitete Karte übergeben
-                            isExpanded = false
-                            onCollapseClick(editedCard)
-                        } else {
-                            // Beim Aufklappen den State ändern
-                            isExpanded = true
-                            onExpandClick()
-                        }
-                    },
+                modifier = Modifier.clickable {
+                    val newExpandedState = !card.isExpanded
+                    onChange(card.copy(isExpanded = newExpandedState))
+                },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -211,8 +196,8 @@ fun CardItem(
 
                 // Pfeil nach unten/oben
                 Icon(
-                    imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = if (isExpanded) "Karte einklappen" else "Karte bearbeiten",
+                    imageVector = if (card.isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = if (card.isExpanded) "Karte einklappen" else "Karte bearbeiten",
                     tint = MaterialTheme.colorScheme.primary
                 )
 
@@ -228,7 +213,7 @@ fun CardItem(
 
             // Erweiterter Bearbeitungsbereich mit AnimatedVisibility
             AnimatedVisibility(
-                visible = isExpanded,
+                visible = card.isExpanded,
                 enter = expandVertically(),
                 exit = shrinkVertically()
             ) {
@@ -239,13 +224,8 @@ fun CardItem(
                 ) {
                     CardEditView(
                         card = card,
-                        onSaveClick = { updatedCard ->
-                            // Aktualisieren des lokalen Zustands
-                            editedCard = updatedCard
-                            onSaveClick(updatedCard)
-                        },
                         onDeleteClick = onDeleteClick,
-                        onCancel = null
+                        onChange = onChange
                     )
                 }
             }
@@ -261,11 +241,9 @@ fun CardItemPreview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             CardItem(
                 card = sampleCard,
-                onExpandClick = {},
-                onCollapseClick = {},
                 onQrCodeClick = {},
-                onSaveClick = {},
-                onDeleteClick = {}
+                onDeleteClick = {},
+                onChange = {}
             )
         }
     }
@@ -319,11 +297,9 @@ fun CardItemNoTitlePreview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             CardItem(
                 card = minimalCard,
-                onExpandClick = {},
-                onCollapseClick = {},
                 onQrCodeClick = {},
-                onSaveClick = {},
-                onDeleteClick = {}
+                onDeleteClick = {},
+                onChange = {}
             )
         }
     }
@@ -336,12 +312,9 @@ fun ExpandedCardItemPreview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             CardItem(
                 card = sampleCard,
-                isNewCard = true,  // Für Preview als neue Karte markieren
-                onExpandClick = {},
-                onCollapseClick = {},
                 onQrCodeClick = {},
-                onSaveClick = {},
-                onDeleteClick = {}
+                onDeleteClick = {},
+                onChange = {}
             )
         }
     }
@@ -354,11 +327,9 @@ fun PrivateCardItemPreview( ) {
         Surface(color = MaterialTheme.colorScheme.background) {
             CardItem(
                 card = privateCard,
-                onExpandClick = {},
-                onCollapseClick = {},
                 onQrCodeClick = {},
-                onSaveClick = {},
-                onDeleteClick = {}
+                onDeleteClick = {},
+                onChange = {}
             )
         }
     }

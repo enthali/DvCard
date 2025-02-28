@@ -102,42 +102,19 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(cards) { card ->
-                        // Prüfen ob diese Karte neu ist (anhand der ID)
-                        val isNewCard = card.id == newCardId
-                        
                         CardItem(
                             card = card,
-                            isNewCard = isNewCard,
-                            onExpandClick = {
-                                Log.d(LogConfig.TAG_UI, "Expand-Button geklickt für Karte ${card.id}")
-                                // Nichts zu tun, CardItem verwaltet den Status selbst
-                            },
-                            onCollapseClick = { updatedCard ->
-                                Log.d(LogConfig.TAG_UI, "Collapse-Button geklickt für Karte ${card.id}")
-                                // Speichere die Änderungen
-                                viewModel.saveCard(updatedCard)
-                                
-                                // Wenn diese Karte die neue Karte war, zurücksetzen
-                                if (card.id == newCardId) {
-                                    newCardId = null
-                                }
-                            },
                             onQrCodeClick = {
                                 Log.d(LogConfig.TAG_UI, "QR-Code-Button geklickt für Karte ${card.id}")
                                 viewModel.showQrCode(card)
                             },
-                            onSaveClick = { updatedCard ->
-                                Log.d(LogConfig.TAG_UI, "Save-Button geklickt für Karte ${card.id}")
-                                viewModel.saveCard(updatedCard)
-                            },
                             onDeleteClick = {
                                 Log.d(LogConfig.TAG_UI, "Delete-Button geklickt für Karte ${card.id}")
                                 viewModel.deleteCard(card)
-                                
-                                // Wenn diese Karte die neue Karte war, zurücksetzen
-                                if (card.id == newCardId) {
-                                    newCardId = null
-                                }
+                            },
+                            onChange = { updatedCard ->
+                                viewModel.saveCard(updatedCard) // Speichern in DB
+                                viewModel.updateCard(updatedCard) // UI aktualisieren
                             }
                         )
                     }

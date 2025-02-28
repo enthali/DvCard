@@ -30,8 +30,6 @@ data class BusinessCard(
     
     var isPrivate: Boolean = false,
     
-    // UI-Zustand, nicht in Datenbank gespeichert
-    @Ignore
     var isExpanded: Boolean = false
 ) {
     /**

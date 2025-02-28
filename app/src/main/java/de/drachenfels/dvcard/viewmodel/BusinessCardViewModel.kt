@@ -65,14 +65,22 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
         Log.d(LogConfig.TAG_VIEWMODEL, "saveCard aufgerufen mit Karte: ID=${card.id}, Name=${card.name}")
         viewModelScope.launch {
             try {
-                // Entferne den UI-Status (isExpanded) vor dem Speichern
-                val dbCard = card.copy(isExpanded = false)
-                repository.updateCard(dbCard)
+                repository.updateCard(card)
                 Log.d(LogConfig.TAG_VIEWMODEL, "Karte erfolgreich aktualisiert")
             } catch (e: Exception) {
                 Log.e(LogConfig.TAG_VIEWMODEL, "Fehler beim Aktualisieren der Karte", e)
             }
         }
+    }
+
+    /**
+     * Aktualisiere lokale LiveData/StateFlow der Karte
+     */
+    fun updateCard(card: BusinessCard) {
+        val updatedCards = _cards.value.map {
+            if (it.id == card.id) card else it
+        }
+        _cards.value = updatedCards
     }
     
     /**
