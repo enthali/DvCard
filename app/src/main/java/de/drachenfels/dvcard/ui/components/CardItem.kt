@@ -46,7 +46,7 @@ fun CardItem(
             // Card Header
             CardHeader(
                 card = card,
-                onQrCodeClick = onQrCodeClick
+                modifier = Modifier.clickable(onClick = onQrCodeClick)
             )
 
             // Card Content
@@ -78,7 +78,6 @@ fun CardItem(
 @Composable
 private fun CardHeader(
     card: BusinessCard,
-    onQrCodeClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -86,12 +85,12 @@ private fun CardHeader(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         // Card type (Private/Business)
         Text(
             text = if (card.isPrivate) stringResource(R.string.card_type_private) else stringResource(R.string.card_type_business),
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.labelLarge,
             color = if (card.isPrivate)
                 MaterialTheme.colorScheme.secondary
             else
@@ -100,13 +99,11 @@ private fun CardHeader(
         )
 
         // QR-Code Icon
-        IconButton(onClick = onQrCodeClick) {
-            Icon(
-                imageVector = Icons.Default.QrCode,
-                contentDescription = stringResource(R.string.qr_code_show),
-                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-            )
-        }
+        Icon(
+            imageVector = Icons.Default.QrCode,
+            contentDescription = stringResource(R.string.qr_code_show),
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+        )
     }
 }
 

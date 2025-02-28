@@ -43,12 +43,16 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(viewModel: BusinessCardViewModel) {
+    Log.d(LogConfig.TAG_UI, "MainScreen composable is being executed")
+    
     val cards by viewModel.cards.collectAsState()
     val qrCodeCard by viewModel.qrCodeDialogCard.collectAsState()
     val scope = rememberCoroutineScope()
 
     // State for the About dialog
     var showAboutDialog by remember { mutableStateOf(false) }
+    
+    Log.d(LogConfig.TAG_UI, "MainScreen state: cards=${cards.size}")
 
     Scaffold(
         topBar = {
@@ -57,6 +61,7 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                     Text(
                         text = stringResource(R.string.app_title),
                         modifier = Modifier.clickable {
+                            Log.d(LogConfig.TAG_UI, "App title clicked - Showing About dialog")
                             showAboutDialog = true
                         }
                     )
@@ -66,6 +71,7 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
+                    Log.d(LogConfig.TAG_UI, "FAB clicked - Creating new card")
                     scope.launch {
                         viewModel.createNewCard()
                     }
@@ -82,23 +88,40 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
         CardList(
             cards = cards,
             paddingValues = paddingValues,
-            onQrCodeClick = { card -> viewModel.showQrCode(card) },
-            onDeleteClick = { card -> viewModel.deleteCard(card) },
-            onCardChange = { updatedCard -> viewModel.saveCard(updatedCard) }
+            onQrCodeClick = { card -> 
+                Log.d(LogConfig.TAG_UI, "QR code button clicked for card ${card.id}")
+                viewModel.showQrCode(card) 
+            },
+            onDeleteClick = { card -> 
+                Log.d(LogConfig.TAG_UI, "Delete button clicked for card ${card.id}")
+                viewModel.deleteCard(card) 
+            },
+            onCardChange = { updatedCard -> 
+                Log.d(LogConfig.TAG_UI, "Card changed: ID=${updatedCard.id}, Name=${updatedCard.name}")
+                viewModel.saveCard(updatedCard) 
+            }
         )
 
         // Show QR code dialog if a card is selected
         qrCodeCard?.let { card ->
+            Log.d(LogConfig.TAG_UI, "Showing QR code dialog for card ${card.id}")
             QrCodeDialog(
                 card = card,
-                onDismiss = { viewModel.dismissQrCode() }
+                onDismiss = { 
+                    Log.d(LogConfig.TAG_UI, "QR code dialog dismissed")
+                    viewModel.dismissQrCode() 
+                }
             )
         }
 
         // Show About dialog if clicked on app title
         if (showAboutDialog) {
+            Log.d(LogConfig.TAG_UI, "Showing About dialog")
             AboutDialog(
-                onDismiss = { showAboutDialog = false }
+                onDismiss = { 
+                    Log.d(LogConfig.TAG_UI, "About dialog dismissed")
+                    showAboutDialog = false 
+                }
             )
         }
     }
@@ -115,6 +138,8 @@ private fun CardList(
     onDeleteClick: (BusinessCard) -> Unit,
     onCardChange: (BusinessCard) -> Unit
 ) {
+    Log.d(LogConfig.TAG_UI, "CardList composable with ${cards.size} cards")
+    
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()

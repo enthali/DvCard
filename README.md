@@ -112,9 +112,9 @@ Die folgenden Optimierungen sind für zukünftige Entwicklungszyklen geplant:
 - ✅ Prüfen, ob lokale `updateCard` und Repository-Update zusammengeführt werden können
 
 ### 4. MainScreen.kt - Vereinfachung
-- Code-Duplikation bei Erstellung neuer Karten beseitigen
-- QR-Code-Anzeige und About-Dialog-Logik in separate Composables extrahieren
-- Vereinfachung der Bedingungsprüfung für leere Kartenliste
+- ✅ Code-Duplikation bei Erstellung neuer Karten beseitigen
+- ✅ QR-Code-Anzeige und About-Dialog-Logik in separate Composables extrahieren
+- ✅ Vereinfachung der Bedingungsprüfung für leere Kartenliste
 
 ### 5. VCardGenerator.kt - Robustere Implementierung
 - Sicherstellen, dass Sonderzeichen in der vCard-Generierung korrekt behandelt werden
