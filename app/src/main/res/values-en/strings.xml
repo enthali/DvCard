@@ -44,7 +44,12 @@
     <string name="about_copyright">© 2025 Georg</string>
     <string name="about_rights">All rights reserved.</string>
     <string name="about_message">Digital Business Card (DvCard) enables management of multiple digital business cards with QR code generation.</string>
+    
+    <!-- QR Code Dialog -->
+    <string name="qr_code_dialog_title">Digital Business Card</string>
+    <string name="qr_code_description">QR code for %1$s</string>
     <string name="qr_code_title">Scan QR Code</string>
-    <string name="qr_code_instruction">Scan this QR code to import contact details:</string>
+    <string name="qr_code_instruction">Scan this code to import contact details.</string>
+    <string name="qr_code_tap_to_close">Tap to close</string>
     <string name="dialog_close">Close</string>
 </resources>

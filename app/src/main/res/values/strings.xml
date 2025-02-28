@@ -44,7 +44,12 @@
     <string name="about_copyright">© 2025 Georg</string>
     <string name="about_rights">Alle Rechte vorbehalten.</string>
     <string name="about_message">Digital Business Card (DvCard) ermöglicht die Verwaltung mehrerer digitaler Visitenkarten mit QR-Code-Generierung.</string>
+    
+    <!-- QR Code Dialog -->
+    <string name="qr_code_dialog_title">Digitale Visitenkarte</string>
+    <string name="qr_code_description">QR-Code für %1$s</string>
     <string name="qr_code_title">QR-Code scannen</string>
-    <string name="qr_code_instruction">Scannen Sie diesen QR-Code, um die Kontaktdaten zu übernehmen:</string>
+    <string name="qr_code_instruction">Scannen Sie diesen Code, um die Kontaktdaten zu importieren.</string>
+    <string name="qr_code_tap_to_close">Tippen zum Schließen</string>
     <string name="dialog_close">Schließen</string>
 </resources>
