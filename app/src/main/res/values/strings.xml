@@ -1,3 +1,41 @@
 <resources>
     <string name="app_name">Digtal Business Card</string>
+    
+    <!-- Card types -->
+    <string name="card_type_private">Privat</string>
+    <string name="card_type_business">Geschäftlich</string>
+    
+    <!-- Card actions -->
+    <string name="qr_code_show">QR-Code anzeigen</string>
+    <string name="card_edit">Karte bearbeiten</string>
+    <string name="card_collapse">Karte einklappen</string>
+    <string name="card_save">Speichern</string>
+    <string name="card_delete">Löschen</string>
+    <string name="card_add">Neue Karte</string>
+    
+    <!-- Contact information -->
+    <string name="phone_prefix">Tel: %1$s</string>
+    <string name="email_prefix">E-Mail: %1$s</string>
+    <string name="website_prefix">Web: %1$s</string>
+    
+    <!-- Form labels -->
+    <string name="title_label">Titel</string>
+    <string name="name_label">Name</string>
+    <string name="position_label">Position</string>
+    <string name="company_label">Firma</string>
+    <string name="phone_label">Telefon</string>
+    <string name="email_label">E-Mail</string>
+    <string name="website_label">Webseite</string>
+    <string name="street_label">Straße</string>
+    <string name="postal_code_label">PLZ</string>
+    <string name="city_label">Ort</string>
+    <string name="country_label">Land</string>
+    <string name="is_private_label">Private Karte</string>
+    
+    <!-- Dialogs -->
+    <string name="about_title">Über die App</string>
+    <string name="about_message">Digital Business Card (DvCard) ermöglicht die Verwaltung mehrerer digitaler Visitenkarten mit QR-Code-Generierung.</string>
+    <string name="qr_code_title">QR-Code scannen</string>
+    <string name="qr_code_instruction">Scannen Sie diesen QR-Code, um die Kontaktdaten zu übernehmen:</string>
+    <string name="dialog_close">Schließen</string>
 </resources>

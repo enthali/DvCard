@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">Digital Business Card</string>
+    
+    <!-- Card types -->
+    <string name="card_type_private">Private</string>
+    <string name="card_type_business">Business</string>
+    
+    <!-- Card actions -->
+    <string name="qr_code_show">Show QR code</string>
+    <string name="card_edit">Edit card</string>
+    <string name="card_collapse">Collapse card</string>
+    <string name="card_save">Save</string>
+    <string name="card_delete">Delete</string>
+    <string name="card_add">New Card</string>
+    
+    <!-- Contact information -->
+    <string name="phone_prefix">Phone: %1$s</string>
+    <string name="email_prefix">Email: %1$s</string>
+    <string name="website_prefix">Web: %1$s</string>
+    
+    <!-- Form labels -->
+    <string name="title_label">Title</string>
+    <string name="name_label">Name</string>
+    <string name="position_label">Position</string>
+    <string name="company_label">Company</string>
+    <string name="phone_label">Phone</string>
+    <string name="email_label">Email</string>
+    <string name="website_label">Website</string>
+    <string name="street_label">Street</string>
+    <string name="postal_code_label">Postal Code</string>
+    <string name="city_label">City</string>
+    <string name="country_label">Country</string>
+    <string name="is_private_label">Private Card</string>
+    
+    <!-- Dialogs -->
+    <string name="about_title">About</string>
+    <string name="about_message">Digital Business Card (DvCard) enables management of multiple digital business cards with QR code generation.</string>
+    <string name="qr_code_title">Scan QR Code</string>
+    <string name="qr_code_instruction">Scan this QR code to import contact details:</string>
+    <string name="dialog_close">Close</string>
+</resources>

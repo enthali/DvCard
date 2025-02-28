@@ -13,19 +13,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import de.drachenfels.dvcard.R
 import de.drachenfels.dvcard.data.model.BusinessCard
 import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
 
 /**
- * Composable für ein einzelnes Visitenkarten-Item in der Liste
+ * Composable for a single business card item in the list
  *
- * @param card Die anzuzeigende Visitenkarte
- * @param onQrCodeClick Callback wenn der QR-Code-Button geklickt wird
- * @param onDeleteClick Callback wenn die Karte gelöscht wird
- * @param onChange Callback wenn die Karte bearbeitet wird
+ * @param card The business card to display
+ * @param onQrCodeClick Callback when the QR code button is clicked
+ * @param onDeleteClick Callback when the card is deleted
+ * @param onChange Callback when the card is edited
  */
 @Composable
 fun CardItem(
@@ -86,9 +88,9 @@ private fun CardHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Kartentyp (Privat/Geschäftlich)
+        // Card type (Private/Business)
         Text(
-            text = if (card.isPrivate) "Privat" else "Geschäftlich",
+            text = if (card.isPrivate) stringResource(R.string.card_type_private) else stringResource(R.string.card_type_business),
             style = MaterialTheme.typography.labelMedium,
             color = if (card.isPrivate)
                 MaterialTheme.colorScheme.secondary
@@ -101,7 +103,7 @@ private fun CardHeader(
         IconButton(onClick = onQrCodeClick) {
             Icon(
                 imageVector = Icons.Default.QrCode,
-                contentDescription = "QR-Code anzeigen",
+                contentDescription = stringResource(R.string.qr_code_show),
                 tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
             )
         }
@@ -118,19 +120,19 @@ private fun CardContent(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)
     ) {
-        // Titel/Name Bereich
+        // Title/Name section
         CardTitleSection(card)
 
-        // Jobbereich (wenn vorhanden)
+        // Job section (if available)
         CardJobSection(card)
 
-        // Kontaktdaten
+        // Contact data
         if (card.phone.isNotEmpty() || card.email.isNotEmpty()) {
             Spacer(modifier = Modifier.height(8.dp))
             CardContactSection(card)
         }
 
-        // Adressdaten
+        // Address data
         if (card.street.isNotEmpty() || card.city.isNotEmpty()) {
             Spacer(modifier = Modifier.height(8.dp))
             CardAddressSection(card)
@@ -140,14 +142,14 @@ private fun CardContent(
 
 @Composable
 private fun CardTitleSection(card: BusinessCard) {
-    // Titel oder Name, je nachdem was gesetzt ist
+    // Title or name, depending on what is set
     val displayTitle = if (card.title.isNotEmpty()) card.title else card.name
     Text(
         text = displayTitle,
         style = MaterialTheme.typography.titleLarge
     )
 
-    // Wenn ein Titel gesetzt ist, zeigen wir auch den Namen an
+    // If a title is set, we also show the name
     if (card.title.isNotEmpty()) {
         Text(
             text = card.name,
@@ -176,14 +178,14 @@ private fun CardJobSection(card: BusinessCard) {
 private fun CardContactSection(card: BusinessCard) {
     if (card.phone.isNotEmpty()) {
         Text(
-            text = "Tel: ${card.phone}",
+            text = stringResource(R.string.phone_prefix, card.phone),
             style = MaterialTheme.typography.bodySmall
         )
     }
 
     if (card.email.isNotEmpty()) {
         Text(
-            text = "E-Mail: ${card.email}",
+            text = stringResource(R.string.email_prefix, card.email),
             style = MaterialTheme.typography.bodySmall
         )
     }
@@ -237,7 +239,7 @@ private fun CardFooter(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Linker Strich
+        // Left divider
         HorizontalDivider(
             modifier = Modifier
                 .weight(1f)
@@ -246,14 +248,14 @@ private fun CardFooter(
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
         )
 
-        // Pfeil nach unten/oben
+        // Arrow up/down
         Icon(
             imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-            contentDescription = if (isExpanded) "Karte einklappen" else "Karte bearbeiten",
+            contentDescription = if (isExpanded) stringResource(R.string.card_collapse) else stringResource(R.string.card_edit),
             tint = MaterialTheme.colorScheme.primary
         )
 
-        // Rechter Strich
+        // Right divider
         HorizontalDivider(
             modifier = Modifier
                 .weight(1f)
@@ -290,7 +292,7 @@ private fun CardEditSection(
     }
 }
 
-// Preview-Funktionen (unverändert beibehalten)
+// Preview functions 
 @Preview(showBackground = true)
 @Composable
 fun CardItemPreview() {
@@ -306,7 +308,7 @@ fun CardItemPreview() {
     }
 }
 
-// Beispieldaten für Previews (unverändert)
+// Sample data for previews
 private val sampleCard = BusinessCard(
     id = 1,
     title = "Geschäftskarte",
@@ -347,7 +349,7 @@ private val minimalCard = BusinessCard(
     email = "john@example.com"
 )
 
-@Preview(showBackground = true, name = "Card ohne Titel")
+@Preview(showBackground = true, name = "Card without title")
 @Composable
 fun CardItemNoTitlePreview() {
     DigtalBusinessCardTheme {
