@@ -9,7 +9,6 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import de.drachenfels.dvcard.data.model.BusinessCard
 import de.drachenfels.dvcard.util.logger.Log
 import de.drachenfels.dvcard.util.logger.LogConfig
-import java.io.File
 
 /**
  * Migration von Version 1 zu Version 2
@@ -17,9 +16,9 @@ import java.io.File
  * Fügt das neue 'title'-Feld zur business_cards-Tabelle hinzu
  */
 private val MIGRATION_1_2 = object : Migration(1, 2) {
-    override fun migrate(database: SupportSQLiteDatabase) {
+    override fun migrate(db: SupportSQLiteDatabase) {
         // Fügt die neue Spalte 'title' mit Standardwert '' hinzu
-        database.execSQL("ALTER TABLE business_cards ADD COLUMN title TEXT NOT NULL DEFAULT ''")
+        db.execSQL("ALTER TABLE business_cards ADD COLUMN title TEXT NOT NULL DEFAULT ''")
     }
 }
 
@@ -29,9 +28,9 @@ private val MIGRATION_1_2 = object : Migration(1, 2) {
  * Fügt das 'isExpanded'-Feld zur business_cards-Tabelle hinzu
  */
 private val MIGRATION_2_3 = object : Migration(2, 3) {
-    override fun migrate(database: SupportSQLiteDatabase) {
+    override fun migrate(db: SupportSQLiteDatabase) {
         // Fügt die neue Spalte 'isExpanded' mit Standardwert 0 (false) hinzu
-        database.execSQL("ALTER TABLE business_cards ADD COLUMN isExpanded INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE business_cards ADD COLUMN isExpanded INTEGER NOT NULL DEFAULT 0")
     }
 }
 
@@ -82,7 +81,7 @@ abstract class BusinessCardDatabase : RoomDatabase() {
                     .addMigrations(MIGRATION_2_3)
                     // Fallback nur als letzte Option
                     .fallbackToDestructiveMigration()
-                    .setJournalMode(RoomDatabase.JournalMode.TRUNCATE) // Sofortiges Committen nach Transaktionen
+                    .setJournalMode(JournalMode.TRUNCATE) // Sofortiges Committen nach Transaktionen
                     .addCallback(object : Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)

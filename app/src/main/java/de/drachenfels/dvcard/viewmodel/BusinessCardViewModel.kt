@@ -46,7 +46,7 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
         var newId: Long? = null
         
         viewModelScope.launch {
-            val newCard = BusinessCard(name = "Neue Karte")
+            val newCard = BusinessCard(name = "Neue Karte", isExpanded = true)
             try {
                 newId = repository.insertCard(newCard)
                 Log.d(LogConfig.TAG_VIEWMODEL, "Neue Karte erfolgreich gespeichert, ID: $newId")
@@ -97,14 +97,7 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
             }
         }
     }
-    
-    /**
-     * Lädt eine bestimmte Karte anhand ihrer ID
-     */
-    suspend fun getCardById(id: Long): BusinessCard? {
-        return repository.getCardById(id)
-    }
-    
+
     /**
      * Öffnet den QR-Code Dialog für eine Karte
      */

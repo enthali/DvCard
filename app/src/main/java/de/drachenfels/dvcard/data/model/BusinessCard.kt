@@ -31,14 +31,4 @@ data class BusinessCard(
     var isPrivate: Boolean = false,
     
     var isExpanded: Boolean = false
-) {
-    /**
-     * Erzeugt eine Kopie dieser Karte mit umgeschaltetem isExpanded-Status
-     */
-    fun toggleExpanded(): BusinessCard = copy(isExpanded = !isExpanded)
-    
-    /**
-     * Erzeugt eine Kopie dieser Karte mit explizitem isExpanded-Status
-     */
-    fun withExpanded(expanded: Boolean): BusinessCard = copy(isExpanded = expanded)
-}
+)

@@ -6,7 +6,6 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.QrCode
@@ -19,19 +18,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.drachenfels.dvcard.data.model.BusinessCard
 import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
-import de.drachenfels.dvcard.util.logger.Log
-import de.drachenfels.dvcard.util.logger.LogConfig
 
 /**
  * Composable für ein einzelnes Visitenkarten-Item in der Liste
  *
  * @param card Die anzuzeigende Visitenkarte
- * @param isNewCard Flag ob diese Karte neu ist und automatisch expandiert werden soll
- * @param onExpandClick Callback wenn der Pfeil zum Expandieren geklickt wird
- * @param onCollapseClick Callback wenn der Pfeil zum Einklappen geklickt wird, gibt die bearbeitete Karte zurück
  * @param onQrCodeClick Callback wenn der QR-Code-Button geklickt wird
- * @param onSaveClick Callback wenn die Karte gespeichert wird
  * @param onDeleteClick Callback wenn die Karte gelöscht wird
+ * @param onChange Callback wenn die Karte bearbeitet wird
  */
 @Composable
 fun CardItem(
@@ -40,9 +34,6 @@ fun CardItem(
     onDeleteClick: () -> Unit,
     onChange: (BusinessCard) -> Unit // Einheitlicher Callback
 ) {
-
-    // Speichern des Zustands der bearbeiteten Karte
-    var editedCard by remember(card) { mutableStateOf(card) }
 
     Card(
         modifier = Modifier

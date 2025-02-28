@@ -4,14 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.drachenfels.dvcard.data.model.BusinessCard
 import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
-import de.drachenfels.dvcard.util.logger.Log
-import de.drachenfels.dvcard.util.logger.LogConfig
 
 /**
  * Composable für die Bearbeitung einer Visitenkarte
@@ -30,37 +27,19 @@ fun CardEditView(
 ) {
     // Hier müssen wir card als Key für remember verwenden, damit die Werte
     // aktualisiert werden, wenn eine neue Karte angezeigt wird
-    var title by remember(card) { mutableStateOf(card.title) }
-    var name by remember(card) { mutableStateOf(card.name) }
-    var position by remember(card) { mutableStateOf(card.position) }
-    var company by remember(card) { mutableStateOf(card.company) }
-    var phone by remember(card) { mutableStateOf(card.phone) }
-    var email by remember(card) { mutableStateOf(card.email) }
-    var website by remember(card) { mutableStateOf(card.website) }
-    var street by remember(card) { mutableStateOf(card.street) }
-    var postalCode by remember(card) { mutableStateOf(card.postalCode) }
-    var city by remember(card) { mutableStateOf(card.city) }
-    var country by remember(card) { mutableStateOf(card.country) }
+    val title by remember(card) { mutableStateOf(card.title) }
+    val name by remember(card) { mutableStateOf(card.name) }
+    val position by remember(card) { mutableStateOf(card.position) }
+    val company by remember(card) { mutableStateOf(card.company) }
+    val phone by remember(card) { mutableStateOf(card.phone) }
+    val email by remember(card) { mutableStateOf(card.email) }
+    val website by remember(card) { mutableStateOf(card.website) }
+    val street by remember(card) { mutableStateOf(card.street) }
+    val postalCode by remember(card) { mutableStateOf(card.postalCode) }
+    val city by remember(card) { mutableStateOf(card.city) }
+    val country by remember(card) { mutableStateOf(card.country) }
     var isPrivate by remember(card) { mutableStateOf(card.isPrivate) }
 
-    // Funktion zum Erstellen einer aktualisierten Karte
-    fun createUpdatedCard(): BusinessCard {
-        return card.copy(
-            title = title,
-            name = name,
-            position = position,
-            company = company,
-            phone = phone,
-            email = email,
-            website = website,
-            street = street,
-            postalCode = postalCode,
-            city = city,
-            country = country,
-            isPrivate = isPrivate,
-            isExpanded = card.isExpanded // Status beibehalten
-        )
-    }
 
     Column(
         modifier = Modifier
@@ -242,8 +221,7 @@ fun CardEditView(
                     onClick = onDeleteClick,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error
-                    )
-                ) {
+                    )) {
                     Text("Löschen")
                 }
             }
