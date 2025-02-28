@@ -1,65 +1,77 @@
-# DvCard - Digitale Visitenkarten als QR-Codes
+# DvCard - Digital Business Cards as QR Codes
 
-## Überblick
-DvCard (Digital vCard) ist eine Android-App zur Verwaltung mehrerer digitaler Visitenkarten. Jede Karte stellt persönliche Kontaktdaten dar und generiert einen QR-Code im vCard-Format, sodass andere Personen durch einfaches Scannen diese Daten in ihre Kontakte übernehmen können.
+## Overview
 
-## Funktionen
-- Verwaltung mehrerer digitaler Visitenkarten (privat und geschäftlich)
-- Ansprechende Darstellung von Kontaktdaten als Visitenkarte
-- Automatische Generierung eines vCard-QR-Codes für jede Karte
-- Einfache Bearbeitung, Erstellung und Löschung von Kontaktdaten
-- Persistente Speicherung der Karten auf dem Gerät
+DvCard (Digital vCard) is an Android app for managing multiple digital business cards. Each card represents personal contact information and generates a QR code in vCard format, allowing others to easily transfer this data into their contacts by simply scanning the code.
 
-## App-Struktur
-### Hauptansicht
-- Scrollbare Liste aller gespeicherten Visitenkarten
-- Jede Karte in kompakter Darstellung mit dem wichtigsten Informationen
-- Bearbeitungs- und QR-Code-Buttons direkt auf jeder Karte
-- Expandierbare Bearbeitungsansicht innerhalb der Liste
-- Floating Action Button (FAB) zum Hinzufügen neuer Karten
+## Features
 
-### Interaktionen
-- Tippen auf Bearbeitungs-Symbol: Erweitert die Karte mit Eingabefeldern
-- Tippen auf QR-Code-Symbol: Öffnet einen Dialog mit dem QR-Code
-- Save-Button: Speichert Änderungen an einer Karte
-- Delete-Button: Entfernt eine Karte aus der Liste
+* Management of multiple digital business cards (personal and professional)
+* Attractive display of contact information as a business card
+* Automatic generation of a vCard QR code for each card
+* Easy editing, creation, and deletion of contact information
+* Persistent storage of cards on the device
 
-## Technische Details
-### Technologie-Stack
-- Kotlin als Programmiersprache
-- Jetpack Compose für das UI-Framework
-- Room-Datenbank für persistente Speicherung
-- ZXing für die QR-Code-Generierung
-- Kotlin DSL für das Build-System (build.gradle.kts)
+## App Structure
 
-### Datenmodell
-Das BusinessCard-Modell speichert folgende Informationen:
-- Name
-- Position
-- Firma
-- Telefonnummer
-- E-Mail
-- Website
-- Flag für private/geschäftliche Karte
-- Ländercode (optional)
+### Main View
 
-### Architektur
-Die App folgt einem leichtgewichtigen MVVM-Muster:
-- **Model**: Room-Datenbank mit Entity und DAO
-- **ViewModel**: Verwaltung der Daten und UI-Zustände
-- **View**: Compose-UI mit reaktiver Aktualisierung
+* Scrollable list of all saved business cards
+* Each card in a compact display with the most important information
+* Edit and QR code buttons directly on each card
+* Expandable edit view within the list
+* Floating Action Button (FAB) to add new cards
 
-### Komponenten
-- **BusinessCardDatabase**: Room-Datenbank für die persistente Speicherung
-- **BusinessCardDao**: Datenbankzugriff (CRUD-Operationen)
-- **BusinessCardRepository**: Zentrale Datenquelle
-- **BusinessCardViewModel**: Geschäftslogik und UI-State-Management
-- **MainScreen**: Listendarstellung aller Karten
-- **CardItem**: UI-Komponente für eine einzelne Karte (kompakt und expandiert)
-- **QrCodeDialog**: Dialog für die Anzeige des QR-Codes
-- **VCardGenerator**: Hilfsfunktionen zur Generierung von vCard und QR-Codes
+### Interactions
 
-## Paket-Struktur
+* Tap the edit icon: Expands the card with input fields
+* Tap the QR code icon: Opens a dialog with the QR code
+* Save button: Saves changes to a card
+* Delete button: Removes a card from the list
+
+## Technical Details
+
+### Technology Stack
+
+* Kotlin as the programming language
+* Jetpack Compose for the UI framework
+* Room database for persistent storage
+* ZXing for QR code generation
+* Kotlin DSL for the build system (build.gradle.kts)
+
+### Data Model
+
+The BusinessCard model stores the following information:
+
+* Name
+* Position
+* Company
+* Phone number
+* Email
+* Website
+* Flag for personal/professional card
+* Country code (optional)
+
+### Architecture
+
+The app follows a lightweight MVVM pattern:
+
+* **Model**: Room database with Entity and DAO
+* **ViewModel**: Management of data and UI states
+* **View**: Compose UI with reactive updating
+
+### Components
+
+* **BusinessCardDatabase**: Room database for persistent storage
+* **BusinessCardDao**: Database access (CRUD operations)
+* **BusinessCardRepository**: Central data source
+* **BusinessCardViewModel**: Business logic and UI state management
+* **MainScreen**: List display of all cards
+* **CardItem**: UI component for a single card (compact and expanded)
+* **QrCodeDialog**: Dialog for displaying the QR code
+* **VCardGenerator**: Helper functions for generating vCard and QR codes
+
+## Package Structure
 ```
 de.drachenfels.dvcard/
 ├── data/
@@ -81,69 +93,88 @@ de.drachenfels.dvcard/
 └── MainActivity.kt
 ```
 
-## Einrichtung und Entwicklung
-### Voraussetzungen
-- Android Studio Hedgehog (2023.1.1) oder neuer
-- Kotlin 1.9.0 oder neuer
-- Gradle 8.0 oder neuer
+## Setup and Development
 
-### Projekteinrichtung
-1. Klone das Repository
-2. Öffne das Projekt in Android Studio
-3. Sync Gradle files
-4. Build und Run
+### Prerequisites
 
-## Geplante Code-Optimierungen (KISS-Prinzip)
+* Android Studio Hedgehog (2023.1.1) or newer
+* Kotlin 1.9.0 or newer
+* Gradle 8.0 or newer
 
-Die folgenden Optimierungen sind für zukünftige Entwicklungszyklen geplant:
+### Project Setup
 
-### 1. CardEditView.kt - Vereinfachung der Callback-Struktur
-- ✅ Parameter für `onDeleteClick` zu nullable geändert (`onDeleteClick: (() -> Unit)?`)
+1.  Clone the repository
+2.  Open the project in Android Studio
+3.  Sync Gradle files
+4.  Build and Run
 
-### 2. CardItem.kt - Unnötige Verschachtelung reduzieren
-- ✅ Verschachtelung von Layouts reduzieren
-- ✅ UI-Komponenten in kleinere Funktionen extrahieren
-- ✅ Beispiel: Card-Header, Card-Content und Card-Footer als separate Composables
-- ✅ i18n einführen von strings in der string.xml für englisch und deutsch.
+## Planned Code Optimizations 
 
-### 3. BusinessCardViewModel.kt - Redundante Methoden vereinfachen
-- ✅ Zusammenführen von `saveCard()` und `updateCard()` 
-- ✅ Reduzierung der Log-Ausgaben für übersichtlicheren Code
-- ✅ Prüfen, ob lokale `updateCard` und Repository-Update zusammengeführt werden können
+The following optimizations are planned for future development cycles:
 
-### 4. MainScreen.kt - Vereinfachung
-- ✅ Code-Duplikation bei Erstellung neuer Karten beseitigen
-- ✅ QR-Code-Anzeige und About-Dialog-Logik in separate Composables extrahieren
-- ✅ Vereinfachung der Bedingungsprüfung für leere Kartenliste
+### 1. CardEditView.kt - Simplify Callback Structure
 
-### 5. VCardGenerator.kt - Robustere Implementierung
-- Sicherstellen, dass Sonderzeichen in der vCard-Generierung korrekt behandelt werden
-- Escaping von Semikolons, Kommas und anderen speziellen Zeichen nach vCard-Spezifikation
-- Bessere Fehlerbehandlung bei der QR-Code-Generierung
+* ✅ Changed parameter for `onDeleteClick` to nullable (`onDeleteClick: (() -> Unit)?`)
 
-### 6. Optimierung der Datenflüsse
-- Vereinfachung der Datenflüsse zwischen ViewModel und UI
-- Prüfen, ob `StateFlow` überall nötig ist oder ob einfachere Lösungen ausreichen
-- Konsistente Strategie für UI-Updates nach Datenänderungen
+### 2. CardItem.kt - Reduce Unnecessary Nesting
 
-### 7. Logging-Optimierung
-- Einführung von Log-Levels (DEBUG, INFO, ERROR) 
-- Reduzierung der Log-Ausgaben für Produktionsnutzung
-- Konfigurierbarkeit des Logging-Verhaltens je nach Build-Typ
+* ✅ Reduce nesting of layouts
+* ✅ Extract UI components into smaller functions
+* ✅ Example: Card Header, Card Content, and Card Footer as separate Composables
+* ✅ Implement i18n of strings in the string.xml for english and german.
 
-### 8. Unnötige Preview-Funktionen zusammenführen
-- Gemeinsamen Code der Preview-Funktionen extrahieren
-- Parameterisierte Preview-Funktionen für verschiedene Karten-Szenarien
+### 3. BusinessCardViewModel.kt - Simplify Redundant Methods
 
-### 9. Redundante Initialisierung im MainActivity
-- Auslagern der Initialisierungslogik in eigene Initializer-Klassen
-- Anwendung von Lazy-Loading-Prinzipien
-- Prüfen, ob Dagger/Hilt für Dependency Injection sinnvoll wäre
+* ✅ Merge `saveCard()` and `updateCard()`
+* ✅ Reduce log outputs for cleaner code
+* ✅ Check if local `updateCard` and Repository update can be merged
 
-### 10. Bessere Fehlerbehandlung
-- Einheitliche Strategie für Fehlerbehandlung im gesamten Projekt
-- Nutzerfreundliche Fehlermeldungen für häufige Fehlerszenarien
-- Implementierung von Recovery-Mechanismen für nicht-kritische Fehler
+### 4. MainScreen.kt - Simplification
 
-## Lizenz
+* ✅ Eliminate code duplication when creating new cards
+* ✅ Extract QR code display and About dialog logic into separate Composables
+* ✅ Simplify conditional check for empty card list
+
+### 5. VCardGenerator.kt - More Robust Implementation
+
+* Ensure special characters are handled correctly in vCard generation
+* Escaping of semicolons, commas, and other special characters according to vCard specifications
+* Better error handling for QR code generation
+
+### 6. Data Flow Optimization
+
+* Simplify data flows between ViewModel and UI
+* Check if `StateFlow` is necessary everywhere or if simpler solutions suffice
+* Consistent strategy for UI updates after data changes
+
+### 7. Logging Optimization
+
+* Introduce log levels (DEBUG, INFO, ERROR)
+* Reduce log outputs for production use
+* Configurability of logging behavior depending on build type
+
+### 8. Merge Unnecessary Preview Functions
+
+* Extract common code from preview functions
+* Parameterized preview functions for different card scenarios
+
+### 9. Redundant Initialization in MainActivity
+
+* Move initialization logic into separate initializer classes
+* Application of lazy-loading principles
+* Check if Dagger/Hilt would be useful for dependency injection
+
+### 10. Better Error Handling
+
+* Uniform error handling strategy throughout the project
+* User-friendly error messages for common error scenarios
+* Implementation of recovery mechanisms for non-critical errors
+
+## Revision History
+| Version | Name                                       | Description                                                                                   |
+| --- |--------------------------------------------|-----------------------------------------------------------------------------------------------|
+| 2 | what a new look! | significant changes to UI handling and i18n preperation, geerman and english language support |
+| 1 | that's what we call an MVP | initial release MVP internal and extended test                                                |
+## License
+
 [MIT License](LICENSE)
