@@ -29,20 +29,39 @@ fun CardEditView(
     onDeleteClick: (() -> Unit)?, // optional delete button
     onCancel: (() -> Unit)? // optional cancel button
 ) {
-    var title by remember { mutableStateOf(card.title) }
-    var name by remember { mutableStateOf(card.name) }
-    var position by remember { mutableStateOf(card.position) }
-    var company by remember { mutableStateOf(card.company) }
-    var phone by remember { mutableStateOf(card.phone) }
-    var email by remember { mutableStateOf(card.email) }
-    var website by remember { mutableStateOf(card.website) }
+    // Hier müssen wir card als Key für remember verwenden, damit die Werte
+    // aktualisiert werden, wenn eine neue Karte angezeigt wird
+    var title by remember(card) { mutableStateOf(card.title) }
+    var name by remember(card) { mutableStateOf(card.name) }
+    var position by remember(card) { mutableStateOf(card.position) }
+    var company by remember(card) { mutableStateOf(card.company) }
+    var phone by remember(card) { mutableStateOf(card.phone) }
+    var email by remember(card) { mutableStateOf(card.email) }
+    var website by remember(card) { mutableStateOf(card.website) }
+    var street by remember(card) { mutableStateOf(card.street) }
+    var postalCode by remember(card) { mutableStateOf(card.postalCode) }
+    var city by remember(card) { mutableStateOf(card.city) }
+    var country by remember(card) { mutableStateOf(card.country) }
+    var isPrivate by remember(card) { mutableStateOf(card.isPrivate) }
 
-    var street by remember { mutableStateOf(card.street) }
-    var postalCode by remember { mutableStateOf(card.postalCode) }
-    var city by remember { mutableStateOf(card.city) }
-    var country by remember { mutableStateOf(card.country) }
-
-    var isPrivate by remember { mutableStateOf(card.isPrivate) }
+    // Funktion zum Erstellen einer aktualisierten Karte
+    fun createUpdatedCard(): BusinessCard {
+        return card.copy(
+            title = title,
+            name = name,
+            position = position,
+            company = company,
+            phone = phone,
+            email = email,
+            website = website,
+            street = street,
+            postalCode = postalCode,
+            city = city,
+            country = country,
+            isPrivate = isPrivate,
+            isExpanded = card.isExpanded // Status beibehalten
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -210,7 +229,7 @@ fun CardEditView(
             singleLine = true
         )
 
-        // Speichern-Button (nun allein in Mitte)
+        // Speichern-Button mit aktualisierter Funktion
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -232,22 +251,7 @@ fun CardEditView(
                 Button(
                     onClick = {
                         Log.d(LogConfig.TAG_UI, "Speichere Karte: ${card.id}")
-                        onSaveClick(
-                            card.copy(
-                                title = title,
-                                name = name,
-                                position = position,
-                                company = company,
-                                phone = phone,
-                                email = email,
-                                website = website,
-                                street = street,
-                                postalCode = postalCode,
-                                city = city,
-                                country = country,
-                                isPrivate = isPrivate
-                            )
-                        )
+                        onSaveClick(createUpdatedCard())
                     }
                 ) {
                     Text("Speichern")

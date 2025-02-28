@@ -21,7 +21,7 @@ import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
 import de.drachenfels.dvcard.util.logger.Log
 import de.drachenfels.dvcard.util.logger.LogConfig
 import de.drachenfels.dvcard.viewmodel.BusinessCardViewModel
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 /**
  * Hauptbildschirm der App mit Liste aller Visitenkarten
@@ -34,14 +34,29 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
     Log.d(LogConfig.TAG_UI, "MainScreen Composable wird ausgeführt")
 
     val cards by viewModel.cards.collectAsState()
-    val editMode by viewModel.cardEditMode.collectAsState()
-    val selectedCard by viewModel.selectedCard.collectAsState()
     val qrCodeCard by viewModel.qrCodeDialogCard.collectAsState()
+    val scope = rememberCoroutineScope()
+    
+    // State für lokale UI-Karten mit isExpanded-Status
+    var uiCards by remember { mutableStateOf(listOf<BusinessCard>()) }
+    
+    // Aktualisiere uiCards wenn sich die DB-Karten ändern
+    LaunchedEffect(cards) {
+        // Behalte isExpanded-Status bei, falls vorhanden
+        uiCards = cards.map { dbCard ->
+            val existingCard = uiCards.find { it.id == dbCard.id }
+            if (existingCard != null) {
+                dbCard.withExpanded(existingCard.isExpanded)
+            } else {
+                dbCard
+            }
+        }
+    }
 
     // State für den About-Dialog
     var showAboutDialog by remember { mutableStateOf(false) }
 
-    Log.d(LogConfig.TAG_UI, "MainScreen State: cards=${cards.size}, editMode=$editMode, selectedCard=${selectedCard?.id}")
+    Log.d(LogConfig.TAG_UI, "MainScreen State: cards=${cards.size}, uiCards=${uiCards.size}")
 
     Scaffold(
         topBar = {
@@ -60,7 +75,19 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 Log.d(LogConfig.TAG_UI, "FAB geklickt - Neue Karte erstellen")
-                viewModel.createNewCard()
+                
+                scope.launch {
+                    val newId = viewModel.createNewCard()
+                    // Wenn neue Karte erstellt wurde, in UI-Zustand aktualisieren
+                    if (newId != null) {
+                        // Warten bis die Karte in der Datenbank ist
+                        val newCard = viewModel.getCardById(newId)
+                        if (newCard != null) {
+                            // Neue Karte in UI-Karten hinzufügen und expandieren
+                            uiCards = uiCards.map { it.withExpanded(false) } + newCard.withExpanded(true)
+                        }
+                    }
+                }
             }) {
                 Icon(Icons.Filled.Add, contentDescription = "Neue Karte hinzufügen")
             }
@@ -71,19 +98,29 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (cards.isEmpty()) {
+            if (uiCards.isEmpty()) {
                 // Anzeige, wenn keine Karten vorhanden sind
                 Log.d(LogConfig.TAG_UI, "Keine Karten vorhanden, zeige EmptyState")
                 EmptyState(
                     onCreateClick = {
                         Log.d(LogConfig.TAG_UI, "EmptyState-Button geklickt - Neue Karte erstellen")
-                        viewModel.createNewCard()
+                        scope.launch {
+                            val newId = viewModel.createNewCard()
+                            if (newId != null) {
+                                // Warten bis die Karte in der Datenbank ist
+                                val newCard = viewModel.getCardById(newId)
+                                if (newCard != null) {
+                                    // Neue Karte in UI-Karten hinzufügen und expandieren
+                                    uiCards = listOf(newCard.withExpanded(true))
+                                }
+                            }
+                        }
                     },
                     modifier = Modifier.align(Alignment.Center)
                 )
             } else {
                 // Liste der Karten
-                Log.d(LogConfig.TAG_UI, "Zeige Kartenliste mit ${cards.size} Karten")
+                Log.d(LogConfig.TAG_UI, "Zeige Kartenliste mit ${uiCards.size} Karten")
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -91,35 +128,45 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                     contentPadding = PaddingValues(vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(cards) { card ->
-                        val isExpanded = when (val mode = editMode) {
-                            is BusinessCardViewModel.CardEditState.Editing ->
-                                mode.cardId == card.id
-                            else -> false
-                        }
-
+                    items(uiCards) { uiCard ->
                         CardItem(
-                            card = card,
-                            isExpanded = isExpanded,
+                            card = uiCard,
                             onExpandClick = {
-                                Log.d(LogConfig.TAG_UI, "Expand-Button geklickt für Karte ${card.id}")
-                                viewModel.editCard(card)
+                                Log.d(LogConfig.TAG_UI, "Expand-Button geklickt für Karte ${uiCard.id}")
+                                // Nur diese Karte öffnen, alle anderen schließen
+                                uiCards = uiCards.map { card ->
+                                    if (card.id == uiCard.id) card.withExpanded(true)
+                                    else card.withExpanded(false)
+                                }
                             },
                             onCollapseClick = { updatedCard ->
-                                Log.d(LogConfig.TAG_UI, "Collapse-Button geklickt für Karte ${card.id}")
+                                Log.d(LogConfig.TAG_UI, "Collapse-Button geklickt für Karte ${uiCard.id}")
+                                // Speichere die Änderungen und schließe die Karte
                                 viewModel.saveCard(updatedCard)
+                                // Aktualisiere UI-Zustand
+                                uiCards = uiCards.map { card ->
+                                    if (card.id == updatedCard.id) updatedCard.withExpanded(false)
+                                    else card
+                                }
                             },
                             onQrCodeClick = {
-                                Log.d(LogConfig.TAG_UI, "QR-Code-Button geklickt für Karte ${card.id}")
-                                viewModel.showQrCode(card)
+                                Log.d(LogConfig.TAG_UI, "QR-Code-Button geklickt für Karte ${uiCard.id}")
+                                viewModel.showQrCode(uiCard)
                             },
                             onSaveClick = { updatedCard ->
-                                Log.d(LogConfig.TAG_UI, "Save-Button geklickt für Karte ${card.id}")
+                                Log.d(LogConfig.TAG_UI, "Save-Button geklickt für Karte ${uiCard.id}")
                                 viewModel.saveCard(updatedCard)
+                                // UI-Zustand aktualisieren, expanded-Status beibehalten
+                                uiCards = uiCards.map { card ->
+                                    if (card.id == updatedCard.id) updatedCard.withExpanded(true)
+                                    else card
+                                }
                             },
                             onDeleteClick = {
-                                Log.d(LogConfig.TAG_UI, "Delete-Button geklickt für Karte ${card.id}")
-                                viewModel.deleteCard(card)
+                                Log.d(LogConfig.TAG_UI, "Delete-Button geklickt für Karte ${uiCard.id}")
+                                viewModel.deleteCard(uiCard)
+                                // Karte aus UI-Zustand entfernen
+                                uiCards = uiCards.filter { it.id != uiCard.id }
                             }
                         )
                     }
@@ -191,144 +238,7 @@ fun EmptyState(onCreateClick: () -> Unit, modifier: Modifier = Modifier) {
     }
 }
 
-// Previews mit UI-Zuständen statt ViewModels
-
-@Composable
-fun MainScreenPreviewContent(
-    cards: List<BusinessCard>,
-    editingCardId: Long? = null,
-    selectedCard: BusinessCard? = null,
-    qrCodeCard: BusinessCard? = null
-) {
-    // UI-Zustandssimulation für Previews
-    val previewEditMode = when {
-        editingCardId != null -> BusinessCardViewModel.CardEditState.Editing(editingCardId)
-        else -> BusinessCardViewModel.CardEditState.Closed
-    }
-
-    val cardsState = remember { mutableStateOf(cards) }
-    val editModeState = remember { mutableStateOf(previewEditMode) }
-    val selectedCardState = remember { mutableStateOf(selectedCard) }
-    val qrCodeCardState = remember { mutableStateOf(qrCodeCard) }
-
-    // Mock des ViewModels für die Preview
-    val previewViewModel = remember {
-        object {
-            val cards = object {
-                fun collectAsState() = cardsState
-            }
-            val cardEditMode = object {
-                fun collectAsState() = editModeState
-            }
-            val selectedCard = object {
-                fun collectAsState() = selectedCardState
-            }
-            val qrCodeDialogCard = object {
-                fun collectAsState() = qrCodeCardState
-            }
-
-            fun createNewCard() {
-                // Simuliere die direkte Erstellung einer neuen Karte
-                val newCard = BusinessCard(
-                    id = (cardsState.value.maxOfOrNull { it.id } ?: 0) + 1,
-                    name = "Neue Karte"
-                )
-                val updatedCards = cardsState.value.toMutableList()
-                updatedCards.add(newCard)
-                cardsState.value = updatedCards
-                
-                selectedCardState.value = newCard
-                editModeState.value = BusinessCardViewModel.CardEditState.Editing(newCard.id)
-            }
-
-            fun editCard(card: BusinessCard) {
-                selectedCardState.value = card
-                editModeState.value = BusinessCardViewModel.CardEditState.Editing(card.id)
-            }
-
-            fun closeEdit() {
-                editModeState.value = BusinessCardViewModel.CardEditState.Closed
-                selectedCardState.value = null
-            }
-
-            fun saveCard(card: BusinessCard) {
-                // Simuliere Kartenaktualisierung
-                val updatedCards = cardsState.value.toMutableList()
-                val index = updatedCards.indexOfFirst { it.id == card.id }
-                if (index >= 0) {
-                    updatedCards[index] = card
-                } else {
-                    updatedCards.add(card.copy(id = (updatedCards.maxOfOrNull { it.id } ?: 0) + 1))
-                }
-                cardsState.value = updatedCards
-                closeEdit()
-            }
-
-            fun deleteCard(card: BusinessCard) {
-                val updatedCards = cardsState.value.filter { it.id != card.id }
-                cardsState.value = updatedCards
-                closeEdit()
-            }
-
-            fun showQrCode(card: BusinessCard) {
-                qrCodeCardState.value = card
-            }
-
-            fun dismissQrCode() {
-                qrCodeCardState.value = null
-            }
-        }
-    }
-
-    // Nutze die UI-Komponente mit dem simulierten ViewModel
-    MainScreen(viewModel = previewViewModel as BusinessCardViewModel)
-}
-
-@Preview(showBackground = true, name = "Kartenliste")
-@Composable
-fun MainScreenPreview() {
-    DigtalBusinessCardTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            // Warnhinweis für Preview-Zwecke
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        Icons.Default.Add,
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        "MainScreen Preview",
-                        style = MaterialTheme.typography.headlineMedium,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        "Preview nicht verfügbar, da ViewModel nicht erweiterbar ist",
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        "Bitte in der Anwendung testen",
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-        }
-    }
-}
-
-// Separate Preview für den EmptyState
+// Preview für den EmptyState
 @Preview(showBackground = true, name = "Leerer Zustand")
 @Composable
 fun EmptyStatePreview() {

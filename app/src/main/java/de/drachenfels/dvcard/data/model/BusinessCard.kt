@@ -1,6 +1,7 @@
 package de.drachenfels.dvcard.data.model
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 /**
@@ -12,20 +13,34 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "business_cards")
 data class BusinessCard(
     @PrimaryKey(autoGenerate = true) 
-    val id: Long = 0,
+    var id: Long = 0,
     
-    val title: String = "", // Neues Feld für den Titel der Karte
-    val name: String = "",
-    val position: String = "",
-    val company: String = "",
-    val phone: String = "",
-    val email: String = "",
-    val website: String = "",
+    var title: String = "", // Neues Feld für den Titel der Karte
+    var name: String = "",
+    var position: String = "",
+    var company: String = "",
+    var phone: String = "",
+    var email: String = "",
+    var website: String = "",
 
-    val street: String = "",
-    val postalCode: String = "",
-    val city: String = "",
-    val country: String = "",
+    var street: String = "",
+    var postalCode: String = "",
+    var city: String = "",
+    var country: String = "",
     
-    val isPrivate: Boolean = false
-)
+    var isPrivate: Boolean = false,
+    
+    // UI-Zustand, nicht in Datenbank gespeichert
+    @Ignore
+    var isExpanded: Boolean = false
+) {
+    /**
+     * Erzeugt eine Kopie dieser Karte mit umgeschaltetem isExpanded-Status
+     */
+    fun toggleExpanded(): BusinessCard = copy(isExpanded = !isExpanded)
+    
+    /**
+     * Erzeugt eine Kopie dieser Karte mit explizitem isExpanded-Status
+     */
+    fun withExpanded(expanded: Boolean): BusinessCard = copy(isExpanded = expanded)
+}

@@ -17,17 +17,9 @@ import kotlinx.coroutines.launch
  */
 class BusinessCardViewModel(private val repository: BusinessCardRepository) : ViewModel() {
     
-    // Status des Bearbeitungsmodus
-    private val _cardEditMode = MutableStateFlow<CardEditState>(CardEditState.Closed)
-    val cardEditMode: StateFlow<CardEditState> = _cardEditMode.asStateFlow()
-    
     // Liste aller Visitenkarten
     private val _cards = MutableStateFlow<List<BusinessCard>>(emptyList())
     val cards: StateFlow<List<BusinessCard>> = _cards.asStateFlow()
-    
-    // Aktuell ausgewählte Karte für Bearbeitung
-    private val _selectedCard = MutableStateFlow<BusinessCard?>(null)
-    val selectedCard: StateFlow<BusinessCard?> = _selectedCard.asStateFlow()
     
     // QR-Code Dialog Status
     private val _qrCodeDialogCard = MutableStateFlow<BusinessCard?>(null)
@@ -46,44 +38,24 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
     }
     
     /**
-     * Erstellt eine neue Karte direkt in der Datenbank und öffnet sie im Bearbeitungsmodus
+     * Erstellt eine neue Karte direkt in der Datenbank
+     * @return Die ID der neuen Karte, falls erfolgreich erstellt
      */
-    fun createNewCard() {
-        Log.d(LogConfig.TAG_VIEWMODEL, "Erstelle neue Karte direkt in der Datenbank")
+    fun createNewCard(): Long? {
+        Log.d(LogConfig.TAG_VIEWMODEL, "Erstelle neue Karte")
+        var newId: Long? = null
+        
         viewModelScope.launch {
             val newCard = BusinessCard(name = "Neue Karte")
             try {
-                val newId = repository.insertCard(newCard)
+                newId = repository.insertCard(newCard)
                 Log.d(LogConfig.TAG_VIEWMODEL, "Neue Karte erfolgreich gespeichert, ID: $newId")
-                
-                // Warten bis die Karte in der Liste erscheint
-                repository.getCardById(newId)?.let { savedCard ->
-                    _selectedCard.value = savedCard
-                    _cardEditMode.value = CardEditState.Editing(newId)
-                    Log.d(LogConfig.TAG_VIEWMODEL, "Edit-Modus auf EDITING für neue Karte gesetzt")
-                }
             } catch (e: Exception) {
                 Log.e(LogConfig.TAG_VIEWMODEL, "Fehler beim Speichern der neuen Karte", e)
             }
         }
-    }
-    
-    /**
-     * Öffnet eine bestehende Karte zur Bearbeitung
-     */
-    fun editCard(card: BusinessCard) {
-        Log.d(LogConfig.TAG_VIEWMODEL, "Öffne Karte zur Bearbeitung: ID=${card.id}, Name=${card.name}")
-        _selectedCard.value = card
-        _cardEditMode.value = CardEditState.Editing(card.id)
-    }
-    
-    /**
-     * Schließt den Bearbeitungsmodus
-     */
-    fun closeEdit() {
-        Log.d(LogConfig.TAG_VIEWMODEL, "Schließe Bearbeitungsmodus")
-        _cardEditMode.value = CardEditState.Closed
-        _selectedCard.value = null
+        
+        return newId
     }
     
     /**
@@ -93,12 +65,13 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
         Log.d(LogConfig.TAG_VIEWMODEL, "saveCard aufgerufen mit Karte: ID=${card.id}, Name=${card.name}")
         viewModelScope.launch {
             try {
-                repository.updateCard(card)
+                // Entferne den UI-Status (isExpanded) vor dem Speichern
+                val dbCard = card.copy(isExpanded = false)
+                repository.updateCard(dbCard)
                 Log.d(LogConfig.TAG_VIEWMODEL, "Karte erfolgreich aktualisiert")
             } catch (e: Exception) {
                 Log.e(LogConfig.TAG_VIEWMODEL, "Fehler beim Aktualisieren der Karte", e)
             }
-            closeEdit()
         }
     }
     
@@ -114,8 +87,14 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
             } catch (e: Exception) {
                 Log.e(LogConfig.TAG_VIEWMODEL, "Fehler beim Löschen der Karte", e)
             }
-            closeEdit()
         }
+    }
+    
+    /**
+     * Lädt eine bestimmte Karte anhand ihrer ID
+     */
+    suspend fun getCardById(id: Long): BusinessCard? {
+        return repository.getCardById(id)
     }
     
     /**
@@ -132,15 +111,6 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
     fun dismissQrCode() {
         Log.d(LogConfig.TAG_VIEWMODEL, "Schließe QR-Code Dialog")
         _qrCodeDialogCard.value = null
-    }
-    
-    /**
-     * Zustand des Bearbeitungsmodus einer Karte
-     */
-    sealed class CardEditState {
-        object Closed : CardEditState()
-        object Creating : CardEditState() // Belassen für Abwärtskompatibilität, wird aber nicht mehr verwendet
-        data class Editing(val cardId: Long) : CardEditState()
     }
 }
 

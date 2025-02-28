@@ -11,7 +11,7 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -19,14 +19,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.drachenfels.dvcard.data.model.BusinessCard
 import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
+import de.drachenfels.dvcard.util.logger.Log
+import de.drachenfels.dvcard.util.logger.LogConfig
 
 /**
  * Composable für ein einzelnes Visitenkarten-Item in der Liste
  *
- * @param card Die anzuzeigende Visitenkarte
- * @param isExpanded Ob die Bearbeitungsansicht sichtbar sein soll
+ * @param card Die anzuzeigende Visitenkarte (enthält jetzt isExpanded)
  * @param onExpandClick Callback wenn der Pfeil zum Expandieren geklickt wird
- * @param onCollapseClick Callback wenn der Pfeil zum Einklappen geklickt wird
+ * @param onCollapseClick Callback wenn der Pfeil zum Einklappen geklickt wird, gibt die bearbeitete Karte zurück
  * @param onQrCodeClick Callback wenn der QR-Code-Button geklickt wird
  * @param onSaveClick Callback wenn die Karte gespeichert wird
  * @param onDeleteClick Callback wenn die Karte gelöscht wird
@@ -34,13 +35,15 @@ import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
 @Composable
 fun CardItem(
     card: BusinessCard,
-    isExpanded: Boolean,
     onExpandClick: () -> Unit,
     onCollapseClick: (BusinessCard) -> Unit,
     onQrCodeClick: () -> Unit,
     onSaveClick: (BusinessCard) -> Unit,
     onDeleteClick: () -> Unit
 ) {
+    // Speichern des Zustands der bearbeiteten Karte
+    var editedCard by remember(card) { mutableStateOf(card) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -182,8 +185,9 @@ fun CardItem(
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 8.dp)
                     .clickable {
-                        if (isExpanded) {
-                            onCollapseClick(card)
+                        if (card.isExpanded) {
+                            // Beim Einklappen die bearbeitete Karte übergeben
+                            onCollapseClick(editedCard)
                         } else {
                             onExpandClick()
                         }
@@ -202,8 +206,8 @@ fun CardItem(
 
                 // Pfeil nach unten/oben
                 Icon(
-                    imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = if (isExpanded) "Karte einklappen" else "Karte bearbeiten",
+                    imageVector = if (card.isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = if (card.isExpanded) "Karte einklappen" else "Karte bearbeiten",
                     tint = MaterialTheme.colorScheme.primary
                 )
 
@@ -219,7 +223,7 @@ fun CardItem(
 
             // Erweiterter Bearbeitungsbereich mit AnimatedVisibility
             AnimatedVisibility(
-                visible = isExpanded,
+                visible = card.isExpanded,
                 enter = expandVertically(),
                 exit = shrinkVertically()
             ) {
@@ -230,12 +234,34 @@ fun CardItem(
                 ) {
                     CardEditView(
                         card = card,
-                        onSaveClick = null, // onSaveClick wird z.Z. nicht benötigt
+                        onSaveClick = { updatedCard ->
+                            // Aktualisieren des lokalen Zustands
+                            editedCard = updatedCard
+                            onSaveClick(updatedCard)
+                        },
                         onDeleteClick = onDeleteClick,
-                        onCancel = null // Cancel-Button wird z.Z. nicht benötigt
+                        onCancel = null
                     )
                 }
             }
+        }
+    }
+}
+
+// Preview-Funktionen (unverändert)
+@Preview(showBackground = true)
+@Composable
+fun CardItemPreview() {
+    DigtalBusinessCardTheme {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            CardItem(
+                card = sampleCard,
+                onExpandClick = {},
+                onCollapseClick = {},
+                onQrCodeClick = {},
+                onSaveClick = {},
+                onDeleteClick = {}
+            )
         }
     }
 }
@@ -281,24 +307,6 @@ private val minimalCard = BusinessCard(
     email = "john@example.com"
 )
 
-@Preview(showBackground = true)
-@Composable
-fun CardItemPreview() {
-    DigtalBusinessCardTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            CardItem(
-                card = sampleCard,
-                isExpanded = false,
-                onExpandClick = {},
-                onCollapseClick = {},
-                onQrCodeClick = {},
-                onSaveClick = {},
-                onDeleteClick = {}
-            )
-        }
-    }
-}
-
 @Preview(showBackground = true, name = "Card ohne Titel")
 @Composable
 fun CardItemNoTitlePreview() {
@@ -306,7 +314,6 @@ fun CardItemNoTitlePreview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             CardItem(
                 card = minimalCard,
-                isExpanded = false,
                 onExpandClick = {},
                 onCollapseClick = {},
                 onQrCodeClick = {},
@@ -323,8 +330,7 @@ fun ExpandedCardItemPreview() {
     DigtalBusinessCardTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             CardItem(
-                card = sampleCard,
-                isExpanded = true,
+                card = sampleCard.copy(isExpanded = true),
                 onExpandClick = {},
                 onCollapseClick = {},
                 onQrCodeClick = {},
@@ -342,7 +348,6 @@ fun PrivateCardItemPreview( ) {
         Surface(color = MaterialTheme.colorScheme.background) {
             CardItem(
                 card = privateCard,
-                isExpanded = false,
                 onExpandClick = {},
                 onCollapseClick = {},
                 onQrCodeClick = {},
