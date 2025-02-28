@@ -32,199 +32,265 @@ fun CardItem(
     card: BusinessCard,
     onQrCodeClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    onChange: (BusinessCard) -> Unit // Einheitlicher Callback
+    onChange: (BusinessCard) -> Unit
 ) {
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onQrCodeClick)
-        ) {
-            // oberer Bereich zeigt die Karte
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(                        
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                    // Kartentyp (Privat/Geschäftlich) vor dem Titel
-                    Text(
-                        text = if (card.isPrivate) "Privat" else "Geschäftlich",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = if (card.isPrivate)
-                            MaterialTheme.colorScheme.secondary
-                        else
-                            MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    ) // QR-Code Icon oben rechts
-                    IconButton(onClick = onQrCodeClick) {
-                        Icon(
-                            imageVector = Icons.Default.QrCode,
-                            contentDescription = "QR-Code anzeigen",
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-                        )
-                    }
-                }
-                    // Kompakte Kartenansicht
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 4.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            // Titel oder Name, je nachdem was gesetzt ist
-                            val displayTitle = if (card.title.isNotEmpty()) card.title else card.name
-                            Text(
-                                text = displayTitle,
-                                style = MaterialTheme.typography.titleLarge
-                            )
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // Card Header
+            CardHeader(
+                card = card,
+                onQrCodeClick = onQrCodeClick
+            )
 
-                            // Wenn ein Titel gesetzt ist, zeigen wir auch den Namen an
-                            if (card.title.isNotEmpty()) {
-                                Text(
-                                    text = card.name,
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                            }
+            // Card Content
+            CardContent(
+                card = card,
+                modifier = Modifier.clickable(onClick = onQrCodeClick)
+            )
 
-                            if (card.position.isNotEmpty()) {
-                                Text(
-                                    text = card.position,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                            if (card.company.isNotEmpty()) {
-                                Text(
-                                    text = card.company,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-
-                            // Kontaktdaten
-                            if (card.phone.isNotEmpty() || card.email.isNotEmpty()) {
-                                Spacer(modifier = Modifier.height(8.dp))
-                            }
-
-                            if (card.phone.isNotEmpty()) {
-                                Text(
-                                    text = "Tel: ${card.phone}",
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                            }
-
-                            if (card.email.isNotEmpty()) {
-                                Text(
-                                    text = "E-Mail: ${card.email}",
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                            }
-
-                            // Adressdaten
-                            if (card.street.isNotEmpty() || card.city.isNotEmpty()) {
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                if (card.street.isNotEmpty()) {
-                                    Text(
-                                        text = card.street,
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-
-                                val locationText = buildString {
-                                    if (card.postalCode.isNotEmpty()) {
-                                        append(card.postalCode)
-                                        append(" ")
-                                    }
-                                    if (card.city.isNotEmpty()) {
-                                        append(card.city)
-                                    }
-                                }
-
-                                if (locationText.isNotEmpty()) {
-                                    Text(
-                                        text = locationText,
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-
-                                if (card.country.isNotEmpty()) {
-                                    Text(
-                                        text = card.country,
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Unterer Bereich mit Pfeil und horizontalen Linien
-            Row(
-                modifier = Modifier.clickable {
+            // Card Footer (Expand/Collapse control)
+            CardFooter(
+                isExpanded = card.isExpanded,
+                onClick = {
                     val newExpandedState = !card.isExpanded
                     onChange(card.copy(isExpanded = newExpandedState))
-                },
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Linker Strich
-                HorizontalDivider(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 8.dp),
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
-                )
-
-                // Pfeil nach unten/oben
-                Icon(
-                    imageVector = if (card.isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = if (card.isExpanded) "Karte einklappen" else "Karte bearbeiten",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-
-                // Rechter Strich
-                HorizontalDivider(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 8.dp),
-                    thickness = 1.dp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
-                )
-            }
-
-            // Erweiterter Bearbeitungsbereich mit AnimatedVisibility
-            AnimatedVisibility(
-                visible = card.isExpanded,
-                enter = expandVertically(),
-                exit = shrinkVertically()
-            ) {
-                // Verwenden Sie ein extra Layout, um den CardEditView zu umschließen
-                Surface(
-                    color = MaterialTheme.colorScheme.surface,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    CardEditView(
-                        card = card,
-                        onDeleteClick = onDeleteClick,
-                        onChange = onChange
-                    )
                 }
-            }
+            )
+
+            // Expandable Edit Section
+            CardEditSection(
+                isExpanded = card.isExpanded,
+                card = card,
+                onDeleteClick = onDeleteClick,
+                onChange = onChange
+            )
         }
     }
 }
 
-// Preview-Funktionen (unverändert)
+@Composable
+private fun CardHeader(
+    card: BusinessCard,
+    onQrCodeClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Kartentyp (Privat/Geschäftlich)
+        Text(
+            text = if (card.isPrivate) "Privat" else "Geschäftlich",
+            style = MaterialTheme.typography.labelMedium,
+            color = if (card.isPrivate)
+                MaterialTheme.colorScheme.secondary
+            else
+                MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold
+        )
+
+        // QR-Code Icon
+        IconButton(onClick = onQrCodeClick) {
+            Icon(
+                imageVector = Icons.Default.QrCode,
+                contentDescription = "QR-Code anzeigen",
+                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun CardContent(
+    card: BusinessCard,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+    ) {
+        // Titel/Name Bereich
+        CardTitleSection(card)
+
+        // Jobbereich (wenn vorhanden)
+        CardJobSection(card)
+
+        // Kontaktdaten
+        if (card.phone.isNotEmpty() || card.email.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            CardContactSection(card)
+        }
+
+        // Adressdaten
+        if (card.street.isNotEmpty() || card.city.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            CardAddressSection(card)
+        }
+    }
+}
+
+@Composable
+private fun CardTitleSection(card: BusinessCard) {
+    // Titel oder Name, je nachdem was gesetzt ist
+    val displayTitle = if (card.title.isNotEmpty()) card.title else card.name
+    Text(
+        text = displayTitle,
+        style = MaterialTheme.typography.titleLarge
+    )
+
+    // Wenn ein Titel gesetzt ist, zeigen wir auch den Namen an
+    if (card.title.isNotEmpty()) {
+        Text(
+            text = card.name,
+            style = MaterialTheme.typography.titleMedium
+        )
+    }
+}
+
+@Composable
+private fun CardJobSection(card: BusinessCard) {
+    if (card.position.isNotEmpty()) {
+        Text(
+            text = card.position,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+    if (card.company.isNotEmpty()) {
+        Text(
+            text = card.company,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Composable
+private fun CardContactSection(card: BusinessCard) {
+    if (card.phone.isNotEmpty()) {
+        Text(
+            text = "Tel: ${card.phone}",
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+
+    if (card.email.isNotEmpty()) {
+        Text(
+            text = "E-Mail: ${card.email}",
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+}
+
+@Composable
+private fun CardAddressSection(card: BusinessCard) {
+    if (card.street.isNotEmpty()) {
+        Text(
+            text = card.street,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+
+    val locationText = buildString {
+        if (card.postalCode.isNotEmpty()) {
+            append(card.postalCode)
+            append(" ")
+        }
+        if (card.city.isNotEmpty()) {
+            append(card.city)
+        }
+    }
+
+    if (locationText.isNotEmpty()) {
+        Text(
+            text = locationText,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+
+    if (card.country.isNotEmpty()) {
+        Text(
+            text = card.country,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+}
+
+@Composable
+private fun CardFooter(
+    isExpanded: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Linker Strich
+        HorizontalDivider(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 8.dp),
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+        )
+
+        // Pfeil nach unten/oben
+        Icon(
+            imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+            contentDescription = if (isExpanded) "Karte einklappen" else "Karte bearbeiten",
+            tint = MaterialTheme.colorScheme.primary
+        )
+
+        // Rechter Strich
+        HorizontalDivider(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 8.dp),
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+        )
+    }
+}
+
+@Composable
+private fun CardEditSection(
+    isExpanded: Boolean,
+    card: BusinessCard,
+    onDeleteClick: () -> Unit,
+    onChange: (BusinessCard) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AnimatedVisibility(
+        visible = isExpanded,
+        enter = expandVertically(),
+        exit = shrinkVertically()
+    ) {
+        Surface(
+            color = MaterialTheme.colorScheme.surface,
+            modifier = modifier.fillMaxWidth()
+        ) {
+            CardEditView(
+                card = card,
+                onDeleteClick = onDeleteClick,
+                onChange = onChange
+            )
+        }
+    }
+}
+
+// Preview-Funktionen (unverändert beibehalten)
 @Preview(showBackground = true)
 @Composable
 fun CardItemPreview() {
@@ -302,7 +368,7 @@ fun ExpandedCardItemPreview() {
     DigtalBusinessCardTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             CardItem(
-                card = sampleCard,
+                card = sampleCard.copy(isExpanded = true),
                 onQrCodeClick = {},
                 onDeleteClick = {},
                 onChange = {}
@@ -313,7 +379,7 @@ fun ExpandedCardItemPreview() {
 
 @Preview(showBackground = true, name = "Private Card")
 @Composable
-fun PrivateCardItemPreview( ) {
+fun PrivateCardItemPreview() {
     DigtalBusinessCardTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             CardItem(
