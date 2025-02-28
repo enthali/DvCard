@@ -36,7 +36,13 @@
     <string name="is_private_label">Private Card</string>
     
     <!-- Dialogs -->
-    <string name="about_title">About</string>
+    <string name="about_title">About this App</string>
+    <string name="about_subtitle">Digital Business Card</string>
+    <string name="about_version">Version: %1$s</string>
+    <string name="about_build">Build: %1$s</string>
+    <string name="about_description">This app allows you to manage digital business cards and generate QR codes in vCard format.</string>
+    <string name="about_copyright">© 2025 Georg</string>
+    <string name="about_rights">All rights reserved.</string>
     <string name="about_message">Digital Business Card (DvCard) enables management of multiple digital business cards with QR code generation.</string>
     <string name="qr_code_title">Scan QR Code</string>
     <string name="qr_code_instruction">Scan this QR code to import contact details:</string>
