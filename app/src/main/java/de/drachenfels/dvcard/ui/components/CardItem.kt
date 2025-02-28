@@ -47,7 +47,11 @@ fun CardItem(
             .padding(vertical = 4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onQrCodeClick)
+        ) {
+            // oberer Bereich zeigt die Karte
             Box(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(                        modifier = Modifier
@@ -172,39 +176,45 @@ fun CardItem(
                 }
             }
 
-            // Unterer Bereich mit Pfeil und Mülleimer
+            // Unterer Bereich mit Pfeil und horizontalen Linien
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
+                    .padding(horizontal = 8.dp, vertical = 8.dp)
+                    .clickable {
+                        if (isExpanded) {
+                            onCollapseClick(card)
+                        } else {
+                            onExpandClick()
+                        }
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Pfeil nach unten/oben
-                IconButton(
-                    onClick = if (isExpanded) {
-                        { onCollapseClick(card) }
-                    } else {
-                        onExpandClick
-                    }
-                ) {
-                    Icon(
-                        imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = if (isExpanded) "Karte einklappen" else "Karte bearbeiten",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
+                // Linker Strich
+                HorizontalDivider(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp),
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                )
 
-                // Mülleimer-Icon (nur wenn nicht im Bearbeitungsmodus)
-                if (!isExpanded) {
-                    IconButton(onClick = onDeleteClick) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Karte löschen",
-                            tint = MaterialTheme.colorScheme.error
-                        )
-                    }
-                }
+                // Pfeil nach unten/oben
+                Icon(
+                    imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = if (isExpanded) "Karte einklappen" else "Karte bearbeiten",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+
+                // Rechter Strich
+                HorizontalDivider(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 8.dp),
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                )
             }
 
             // Erweiterter Bearbeitungsbereich mit AnimatedVisibility
@@ -220,9 +230,9 @@ fun CardItem(
                 ) {
                     CardEditView(
                         card = card,
-                        onSaveClick = onSaveClick,
-                        onDeleteClick = null, // Delete-Button im Editor entfernt
-                        onCancel = null // Cancel-Button im Editor entfernt
+                        onSaveClick = null, // onSaveClick wird z.Z. nicht benötigt
+                        onDeleteClick = onDeleteClick,
+                        onCancel = null // Cancel-Button wird z.Z. nicht benötigt
                     )
                 }
             }
@@ -307,7 +317,7 @@ fun CardItemNoTitlePreview() {
     }
 }
 
-@Preview(showBackground = true, name = "Expanded Card")
+@Preview(showBackground = true, name = "Expanded Card", heightDp = 1300 )
 @Composable
 fun ExpandedCardItemPreview() {
     DigtalBusinessCardTheme {
@@ -327,7 +337,7 @@ fun ExpandedCardItemPreview() {
 
 @Preview(showBackground = true, name = "Private Card")
 @Composable
-fun PrivateCardItemPreview() {
+fun PrivateCardItemPreview( ) {
     DigtalBusinessCardTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             CardItem(

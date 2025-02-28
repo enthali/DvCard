@@ -17,17 +17,17 @@ import de.drachenfels.dvcard.util.logger.LogConfig
  * Composable für die Bearbeitung einer Visitenkarte
  *
  * @param card Die zu bearbeitende Visitenkarte
- * @param onSaveClick Callback wenn die Karte gespeichert wird
- * @param onDeleteClick Callback wenn die Karte gelöscht wird (null = keine Löschfunktion) - wird nicht mehr verwendet
- * @param onCancel Callback wenn die Bearbeitung abgebrochen wird (null = keine Abbruch-Funktion) - wird nicht mehr verwendet
+ * @param onSaveClick Callback wenn die Karte gespeichert wird (null = keine Speicherung)
+ * @param onDeleteClick Callback wenn die Karte gelöscht wird (null = keine Löschfunktion)
+ * @param onCancel Callback wenn die Bearbeitung abgebrochen wird (null = keine Abbruch-Funktion)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardEditView(
     card: BusinessCard,
-    onSaveClick: (BusinessCard) -> Unit,
-    onDeleteClick: (() -> Unit)?, // Wird nicht mehr verwendet
-    onCancel: (() -> Unit)? // Wird nicht mehr verwendet
+    onSaveClick: ((BusinessCard) -> Unit)?, // optional save button
+    onDeleteClick: (() -> Unit)?, // optional delete button
+    onCancel: (() -> Unit)? // optional cancel button
 ) {
     var title by remember { mutableStateOf(card.title) }
     var name by remember { mutableStateOf(card.name) }
@@ -49,8 +49,6 @@ fun CardEditView(
             .fillMaxWidth()
             .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
     ) {
-        HorizontalDivider(modifier = Modifier.padding(bottom = 16.dp))
-
         // Kartentyp-Auswahl mit Segmented Control
         Text(
             text = "Kartentyp",
@@ -213,34 +211,47 @@ fun CardEditView(
         )
 
         // Speichern-Button (nun allein in Mitte)
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp)
+                .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.Center
         ) {
-            Button(
-                onClick = {
-                    Log.d(LogConfig.TAG_UI, "Speichere Karte: ${card.id}")
-                    onSaveClick(
-                        card.copy(
-                            title = title,
-                            name = name,
-                            position = position,
-                            company = company,
-                            phone = phone,
-                            email = email,
-                            website = website,
-                            street = street,
-                            postalCode = postalCode,
-                            city = city,
-                            country = country,
-                            isPrivate = isPrivate
-                        )
+            if (onDeleteClick != null) {
+                Button(
+                    onClick = onDeleteClick,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
                     )
-                },
-                modifier = Modifier.align(Alignment.Center)
-            ) {
-                Text("Speichern")
+                ) {
+                    Text("Löschen")
+                }
+            }
+
+            if (onSaveClick != null){
+                Button(
+                    onClick = {
+                        Log.d(LogConfig.TAG_UI, "Speichere Karte: ${card.id}")
+                        onSaveClick(
+                            card.copy(
+                                title = title,
+                                name = name,
+                                position = position,
+                                company = company,
+                                phone = phone,
+                                email = email,
+                                website = website,
+                                street = street,
+                                postalCode = postalCode,
+                                city = city,
+                                country = country,
+                                isPrivate = isPrivate
+                            )
+                        )
+                    }
+                ) {
+                    Text("Speichern")
+                }
             }
         }
     }
@@ -263,7 +274,7 @@ private val sampleCard = BusinessCard(
     isPrivate = false
 )
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, heightDp = 1000)
 @Composable
 fun CardEditViewPreview() {
     DigtalBusinessCardTheme {
@@ -274,14 +285,14 @@ fun CardEditViewPreview() {
             CardEditView(
                 card = sampleCard,
                 onSaveClick = {},
-                onDeleteClick = null,
+                onDeleteClick = {},
                 onCancel = null
             )
         }
     }
 }
 
-@Preview(showBackground = true, name = "Neue Karte")
+@Preview(showBackground = true, name = "Neue Karte", heightDp = 1000)
 @Composable
 fun NewCardEditViewPreview() {
     DigtalBusinessCardTheme {
@@ -291,15 +302,15 @@ fun NewCardEditViewPreview() {
         ) {
             CardEditView(
                 card = BusinessCard(), // Leere Karte
-                onSaveClick = {},
-                onDeleteClick = null, // Keine Löschfunktion
+                onSaveClick = null,
+                onDeleteClick = {},
                 onCancel = null
             )
         }
     }
 }
 
-@Preview(showBackground = true, name = "Private Karte")
+@Preview(showBackground = true, name = "Private Karte", heightDp = 1000)
 @Composable
 fun PrivateCardEditViewPreview() {
     DigtalBusinessCardTheme {
@@ -310,7 +321,7 @@ fun PrivateCardEditViewPreview() {
             CardEditView(
                 card = sampleCard.copy(isPrivate = true),
                 onSaveClick = {},
-                onDeleteClick = null,
+                onDeleteClick = {},
                 onCancel = null
             )
         }
