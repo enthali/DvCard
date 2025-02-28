@@ -37,26 +37,13 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
     val qrCodeCard by viewModel.qrCodeDialogCard.collectAsState()
     val scope = rememberCoroutineScope()
     
-    // State für lokale UI-Karten mit isExpanded-Status
-    var uiCards by remember { mutableStateOf(listOf<BusinessCard>()) }
+    // State für neu erstellte Karte, um sie als "isNewCard" zu markieren
+    var newCardId by remember { mutableStateOf<Long?>(null) }
     
-    // Aktualisiere uiCards wenn sich die DB-Karten ändern
-    LaunchedEffect(cards) {
-        // Behalte isExpanded-Status bei, falls vorhanden
-        uiCards = cards.map { dbCard ->
-            val existingCard = uiCards.find { it.id == dbCard.id }
-            if (existingCard != null) {
-                dbCard.withExpanded(existingCard.isExpanded)
-            } else {
-                dbCard
-            }
-        }
-    }
-
     // State für den About-Dialog
     var showAboutDialog by remember { mutableStateOf(false) }
 
-    Log.d(LogConfig.TAG_UI, "MainScreen State: cards=${cards.size}, uiCards=${uiCards.size}")
+    Log.d(LogConfig.TAG_UI, "MainScreen State: cards=${cards.size}")
 
     Scaffold(
         topBar = {
@@ -77,16 +64,9 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                 Log.d(LogConfig.TAG_UI, "FAB geklickt - Neue Karte erstellen")
                 
                 scope.launch {
-                    val newId = viewModel.createNewCard()
-                    // Wenn neue Karte erstellt wurde, in UI-Zustand aktualisieren
-                    if (newId != null) {
-                        // Warten bis die Karte in der Datenbank ist
-                        val newCard = viewModel.getCardById(newId)
-                        if (newCard != null) {
-                            // Neue Karte in UI-Karten hinzufügen und expandieren
-                            uiCards = uiCards.map { it.withExpanded(false) } + newCard.withExpanded(true)
-                        }
-                    }
+                    val id = viewModel.createNewCard()
+                    // Speichern der ID der neuen Karte
+                    newCardId = id
                 }
             }) {
                 Icon(Icons.Filled.Add, contentDescription = "Neue Karte hinzufügen")
@@ -98,29 +78,22 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (uiCards.isEmpty()) {
+            if (cards.isEmpty()) {
                 // Anzeige, wenn keine Karten vorhanden sind
                 Log.d(LogConfig.TAG_UI, "Keine Karten vorhanden, zeige EmptyState")
                 EmptyState(
                     onCreateClick = {
                         Log.d(LogConfig.TAG_UI, "EmptyState-Button geklickt - Neue Karte erstellen")
                         scope.launch {
-                            val newId = viewModel.createNewCard()
-                            if (newId != null) {
-                                // Warten bis die Karte in der Datenbank ist
-                                val newCard = viewModel.getCardById(newId)
-                                if (newCard != null) {
-                                    // Neue Karte in UI-Karten hinzufügen und expandieren
-                                    uiCards = listOf(newCard.withExpanded(true))
-                                }
-                            }
+                            val id = viewModel.createNewCard()
+                            newCardId = id
                         }
                     },
                     modifier = Modifier.align(Alignment.Center)
                 )
             } else {
                 // Liste der Karten
-                Log.d(LogConfig.TAG_UI, "Zeige Kartenliste mit ${uiCards.size} Karten")
+                Log.d(LogConfig.TAG_UI, "Zeige Kartenliste mit ${cards.size} Karten")
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -128,45 +101,43 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                     contentPadding = PaddingValues(vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(uiCards) { uiCard ->
+                    items(cards) { card ->
+                        // Prüfen ob diese Karte neu ist (anhand der ID)
+                        val isNewCard = card.id == newCardId
+                        
                         CardItem(
-                            card = uiCard,
+                            card = card,
+                            isNewCard = isNewCard,
                             onExpandClick = {
-                                Log.d(LogConfig.TAG_UI, "Expand-Button geklickt für Karte ${uiCard.id}")
-                                // Nur diese Karte öffnen, alle anderen schließen
-                                uiCards = uiCards.map { card ->
-                                    if (card.id == uiCard.id) card.withExpanded(true)
-                                    else card.withExpanded(false)
-                                }
+                                Log.d(LogConfig.TAG_UI, "Expand-Button geklickt für Karte ${card.id}")
+                                // Nichts zu tun, CardItem verwaltet den Status selbst
                             },
                             onCollapseClick = { updatedCard ->
-                                Log.d(LogConfig.TAG_UI, "Collapse-Button geklickt für Karte ${uiCard.id}")
-                                // Speichere die Änderungen und schließe die Karte
+                                Log.d(LogConfig.TAG_UI, "Collapse-Button geklickt für Karte ${card.id}")
+                                // Speichere die Änderungen
                                 viewModel.saveCard(updatedCard)
-                                // Aktualisiere UI-Zustand
-                                uiCards = uiCards.map { card ->
-                                    if (card.id == updatedCard.id) updatedCard.withExpanded(false)
-                                    else card
+                                
+                                // Wenn diese Karte die neue Karte war, zurücksetzen
+                                if (card.id == newCardId) {
+                                    newCardId = null
                                 }
                             },
                             onQrCodeClick = {
-                                Log.d(LogConfig.TAG_UI, "QR-Code-Button geklickt für Karte ${uiCard.id}")
-                                viewModel.showQrCode(uiCard)
+                                Log.d(LogConfig.TAG_UI, "QR-Code-Button geklickt für Karte ${card.id}")
+                                viewModel.showQrCode(card)
                             },
                             onSaveClick = { updatedCard ->
-                                Log.d(LogConfig.TAG_UI, "Save-Button geklickt für Karte ${uiCard.id}")
+                                Log.d(LogConfig.TAG_UI, "Save-Button geklickt für Karte ${card.id}")
                                 viewModel.saveCard(updatedCard)
-                                // UI-Zustand aktualisieren, expanded-Status beibehalten
-                                uiCards = uiCards.map { card ->
-                                    if (card.id == updatedCard.id) updatedCard.withExpanded(true)
-                                    else card
-                                }
                             },
                             onDeleteClick = {
-                                Log.d(LogConfig.TAG_UI, "Delete-Button geklickt für Karte ${uiCard.id}")
-                                viewModel.deleteCard(uiCard)
-                                // Karte aus UI-Zustand entfernen
-                                uiCards = uiCards.filter { it.id != uiCard.id }
+                                Log.d(LogConfig.TAG_UI, "Delete-Button geklickt für Karte ${card.id}")
+                                viewModel.deleteCard(card)
+                                
+                                // Wenn diese Karte die neue Karte war, zurücksetzen
+                                if (card.id == newCardId) {
+                                    newCardId = null
+                                }
                             }
                         )
                     }

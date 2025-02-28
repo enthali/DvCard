@@ -25,7 +25,8 @@ import de.drachenfels.dvcard.util.logger.LogConfig
 /**
  * Composable für ein einzelnes Visitenkarten-Item in der Liste
  *
- * @param card Die anzuzeigende Visitenkarte (enthält jetzt isExpanded)
+ * @param card Die anzuzeigende Visitenkarte
+ * @param isNewCard Flag ob diese Karte neu ist und automatisch expandiert werden soll
  * @param onExpandClick Callback wenn der Pfeil zum Expandieren geklickt wird
  * @param onCollapseClick Callback wenn der Pfeil zum Einklappen geklickt wird, gibt die bearbeitete Karte zurück
  * @param onQrCodeClick Callback wenn der QR-Code-Button geklickt wird
@@ -35,12 +36,16 @@ import de.drachenfels.dvcard.util.logger.LogConfig
 @Composable
 fun CardItem(
     card: BusinessCard,
+    isNewCard: Boolean = false,
     onExpandClick: () -> Unit,
     onCollapseClick: (BusinessCard) -> Unit,
     onQrCodeClick: () -> Unit,
     onSaveClick: (BusinessCard) -> Unit,
     onDeleteClick: () -> Unit
 ) {
+    // Interner State für expanded status - initial auf true setzen für neue Karten
+    var isExpanded by remember { mutableStateOf(isNewCard) }
+    
     // Speichern des Zustands der bearbeiteten Karte
     var editedCard by remember(card) { mutableStateOf(card) }
 
@@ -57,14 +62,13 @@ fun CardItem(
             // oberer Bereich zeigt die Karte
             Box(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Row(                        modifier = Modifier
-                        .fillMaxWidth(),
+                    Row(                        
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                     // Kartentyp (Privat/Geschäftlich) vor dem Titel
                     Text(
-
                         text = if (card.isPrivate) "Privat" else "Geschäftlich",
                         style = MaterialTheme.typography.labelMedium,
                         color = if (card.isPrivate)
@@ -173,8 +177,6 @@ fun CardItem(
                                 }
                             }
                         }
-
-
                     }
                 }
             }
@@ -185,10 +187,13 @@ fun CardItem(
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 8.dp)
                     .clickable {
-                        if (card.isExpanded) {
+                        if (isExpanded) {
                             // Beim Einklappen die bearbeitete Karte übergeben
+                            isExpanded = false
                             onCollapseClick(editedCard)
                         } else {
+                            // Beim Aufklappen den State ändern
+                            isExpanded = true
                             onExpandClick()
                         }
                     },
@@ -206,8 +211,8 @@ fun CardItem(
 
                 // Pfeil nach unten/oben
                 Icon(
-                    imageVector = if (card.isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = if (card.isExpanded) "Karte einklappen" else "Karte bearbeiten",
+                    imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = if (isExpanded) "Karte einklappen" else "Karte bearbeiten",
                     tint = MaterialTheme.colorScheme.primary
                 )
 
@@ -223,7 +228,7 @@ fun CardItem(
 
             // Erweiterter Bearbeitungsbereich mit AnimatedVisibility
             AnimatedVisibility(
-                visible = card.isExpanded,
+                visible = isExpanded,
                 enter = expandVertically(),
                 exit = shrinkVertically()
             ) {
@@ -330,7 +335,8 @@ fun ExpandedCardItemPreview() {
     DigtalBusinessCardTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             CardItem(
-                card = sampleCard.copy(isExpanded = true),
+                card = sampleCard,
+                isNewCard = true,  // Für Preview als neue Karte markieren
                 onExpandClick = {},
                 onCollapseClick = {},
                 onQrCodeClick = {},
