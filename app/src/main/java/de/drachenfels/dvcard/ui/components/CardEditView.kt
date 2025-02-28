@@ -5,55 +5,87 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import de.drachenfels.dvcard.R
 import de.drachenfels.dvcard.data.model.BusinessCard
 import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
 
 /**
- * Composable für die Bearbeitung einer Visitenkarte
+ * Composable for editing a business card
  *
- * @param card Die zu bearbeitende Visitenkarte
- * @param onSaveClick Callback wenn die Karte gespeichert wird (null = keine Speicherung)
- * @param onDeleteClick Callback wenn die Karte gelöscht wird (null = keine Löschfunktion)
- * @param onCancel Callback wenn die Bearbeitung abgebrochen wird (null = keine Abbruch-Funktion)
+ * @param card The business card to edit
+ * @param onDeleteClick Callback when the card is deleted (null = no delete function)
+ * @param onChange Callback when the card is modified
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardEditView(
     card: BusinessCard,
     onDeleteClick: (() -> Unit)?,
-    onChange: (BusinessCard) -> Unit // Generischer Callback
+    onChange: (BusinessCard) -> Unit
 ) {
-    // Hier müssen wir card als Key für remember verwenden, damit die Werte
-    // aktualisiert werden, wenn eine neue Karte angezeigt wird
-    val title by remember(card) { mutableStateOf(card.title) }
-    val name by remember(card) { mutableStateOf(card.name) }
-    val position by remember(card) { mutableStateOf(card.position) }
-    val company by remember(card) { mutableStateOf(card.company) }
-    val phone by remember(card) { mutableStateOf(card.phone) }
-    val email by remember(card) { mutableStateOf(card.email) }
-    val website by remember(card) { mutableStateOf(card.website) }
-    val street by remember(card) { mutableStateOf(card.street) }
-    val postalCode by remember(card) { mutableStateOf(card.postalCode) }
-    val city by remember(card) { mutableStateOf(card.city) }
-    val country by remember(card) { mutableStateOf(card.country) }
     var isPrivate by remember(card) { mutableStateOf(card.isPrivate) }
-
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
     ) {
-        // Kartentyp-Auswahl mit Segmented Control
+        // Card type selection
+        CardTypeSelector(
+            isPrivate = isPrivate,
+            onCardTypeChange = { 
+                isPrivate = it
+                onChange(card.copy(isPrivate = it))
+            }
+        )
+
+        // Personal information section
+        PersonalInfoSection(card, onChange)
+        
+        // Contact information section
+        ContactInfoSection(card, onChange)
+        
+        // Address information section
+        AddressInfoSection(card, onChange)
+
+        // Delete button
+        if (onDeleteClick != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    onClick = onDeleteClick,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text(stringResource(R.string.card_delete))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CardTypeSelector(
+    isPrivate: Boolean,
+    onCardTypeChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
         Text(
-            text = "Kartentyp",
+            text = stringResource(R.string.card_type_label),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        // Segmented Control für Kartentyp
+        // Segmented control for card type
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -61,9 +93,9 @@ fun CardEditView(
                 .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Geschäftlich Button
+            // Business button
             OutlinedButton(
-                onClick = { isPrivate = false },
+                onClick = { onCardTypeChange(false) },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = if (!isPrivate) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
@@ -71,13 +103,12 @@ fun CardEditView(
                 ),
                 border = if (!isPrivate) null else ButtonDefaults.outlinedButtonBorder(enabled = true)
             ) {
-                Text("Geschäftlich")
-                onChange(card.copy(isPrivate = isPrivate))
+                Text(stringResource(R.string.card_type_business))
             }
 
-            // Privat Button
+            // Private button
             OutlinedButton(
-                onClick = { isPrivate = true },
+                onClick = { onCardTypeChange(true) },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = if (isPrivate) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
@@ -85,115 +116,152 @@ fun CardEditView(
                 ),
                 border = if (isPrivate) null else ButtonDefaults.outlinedButtonBorder(enabled = true)
             ) {
-                Text("Privat")
-                onChange(card.copy(isPrivate = isPrivate))
+                Text(stringResource(R.string.card_type_private))
             }
         }
+    }
+}
 
-        // Eingabefelder
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PersonalInfoSection(
+    card: BusinessCard,
+    onChange: (BusinessCard) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        // Card title
         OutlinedTextField(
-            value = title,
-            onValueChange = {onChange(card.copy(title = it))},
-            label = { Text("Titel der Karte") },
-            placeholder = { Text("Optional - wird statt Name angezeigt, wenn gesetzt") },
+            value = card.title,
+            onValueChange = { onChange(card.copy(title = it)) },
+            label = { Text(stringResource(R.string.title_label)) },
+            placeholder = { Text(stringResource(R.string.title_placeholder)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Name
         OutlinedTextField(
-            value = name,
+            value = card.name,
             onValueChange = { onChange(card.copy(name = it)) },
-            label = { Text("Name") },
+            label = { Text(stringResource(R.string.name_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Position
         OutlinedTextField(
-            value = position,
+            value = card.position,
             onValueChange = { onChange(card.copy(position = it)) },
-            label = { Text("Position") },
+            label = { Text(stringResource(R.string.position_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Company
         OutlinedTextField(
-            value = company,
-            onValueChange = { onChange(card.copy(company = it))  },
-            label = { Text("Firma") },
+            value = card.company,
+            onValueChange = { onChange(card.copy(company = it)) },
+            label = { Text(stringResource(R.string.company_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
+    }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ContactInfoSection(
+    card: BusinessCard,
+    onChange: (BusinessCard) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier.height(8.dp))
-
+        
+        // Phone
         OutlinedTextField(
-            value = phone,
+            value = card.phone,
             onValueChange = { onChange(card.copy(phone = it)) },
-            label = { Text("Telefon") },
+            label = { Text(stringResource(R.string.phone_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Email
         OutlinedTextField(
-            value = email,
-            onValueChange = { onChange(card.copy(email = it))   },
-            label = { Text("E-Mail") },
+            value = card.email,
+            onValueChange = { onChange(card.copy(email = it)) },
+            label = { Text(stringResource(R.string.email_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Website
         OutlinedTextField(
-            value = website,
-            onValueChange = { onChange(card.copy(website = it))   },
-            label = { Text("Webseite") },
+            value = card.website,
+            onValueChange = { onChange(card.copy(website = it)) },
+            label = { Text(stringResource(R.string.website_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
+    }
+}
 
-        // Neue Adressfelder
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AddressInfoSection(
+    card: BusinessCard,
+    onChange: (BusinessCard) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        // Address header
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Adresse",
+            text = stringResource(R.string.address_section_label),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(vertical = 8.dp)
         )
 
+        // Street
         OutlinedTextField(
-            value = street,
-            onValueChange = { onChange(card.copy(street = it))  },
-            label = { Text("Straße und Hausnummer") },
+            value = card.street,
+            onValueChange = { onChange(card.copy(street = it)) },
+            label = { Text(stringResource(R.string.street_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Postal code and city in one row
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             OutlinedTextField(
-                value = postalCode,
+                value = card.postalCode,
                 onValueChange = { onChange(card.copy(postalCode = it)) },
-                label = { Text("PLZ") },
+                label = { Text(stringResource(R.string.postal_code_label)) },
                 modifier = Modifier.weight(0.4f),
                 singleLine = true
             )
 
             OutlinedTextField(
-                value = city,
+                value = card.city,
                 onValueChange = { onChange(card.copy(city = it)) },
-                label = { Text("Ort") },
+                label = { Text(stringResource(R.string.city_label)) },
                 modifier = Modifier.weight(0.6f),
                 singleLine = true
             )
@@ -201,35 +269,18 @@ fun CardEditView(
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Country
         OutlinedTextField(
-            value = country,
+            value = card.country,
             onValueChange = { onChange(card.copy(country = it)) },
-            label = { Text("Land") },
+            label = { Text(stringResource(R.string.country_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
-
-        // Speichern-Button mit aktualisierter Funktion
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-                horizontalArrangement = Arrangement.Center
-        ) {
-            if (onDeleteClick != null) {
-                Button(
-                    onClick = onDeleteClick,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    )) {
-                    Text("Löschen")
-                }
-            }
-        }
     }
 }
 
-// Beispieldaten für Preview
+// Sample data for previews
 private val sampleCard = BusinessCard(
     id = 1,
     title = "Geschäftskarte",
@@ -263,7 +314,7 @@ fun CardEditViewPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "Neue Karte", heightDp = 1000)
+@Preview(showBackground = true, name = "New Card", heightDp = 1000)
 @Composable
 fun NewCardEditViewPreview() {
     DigtalBusinessCardTheme {
@@ -272,7 +323,7 @@ fun NewCardEditViewPreview() {
             modifier = Modifier.padding(16.dp)
         ) {
             CardEditView(
-                card = BusinessCard(), // Leere Karte
+                card = BusinessCard(), // Empty card
                 onDeleteClick = {},
                 onChange = {}
             )
@@ -280,7 +331,7 @@ fun NewCardEditViewPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "Private Karte", heightDp = 1000)
+@Preview(showBackground = true, name = "Private Card", heightDp = 1000)
 @Composable
 fun PrivateCardEditViewPreview() {
     DigtalBusinessCardTheme {

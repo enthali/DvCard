@@ -4,6 +4,7 @@
     <!-- Card types -->
     <string name="card_type_private">Privat</string>
     <string name="card_type_business">Geschäftlich</string>
+    <string name="card_type_label">Kartentyp</string>
     
     <!-- Card actions -->
     <string name="qr_code_show">QR-Code anzeigen</string>
@@ -19,14 +20,16 @@
     <string name="website_prefix">Web: %1$s</string>
     
     <!-- Form labels -->
-    <string name="title_label">Titel</string>
+    <string name="title_label">Titel der Karte</string>
+    <string name="title_placeholder">Optional - wird statt Name angezeigt, wenn gesetzt</string>
     <string name="name_label">Name</string>
     <string name="position_label">Position</string>
     <string name="company_label">Firma</string>
     <string name="phone_label">Telefon</string>
     <string name="email_label">E-Mail</string>
     <string name="website_label">Webseite</string>
-    <string name="street_label">Straße</string>
+    <string name="address_section_label">Adresse</string>
+    <string name="street_label">Straße und Hausnummer</string>
     <string name="postal_code_label">PLZ</string>
     <string name="city_label">Ort</string>
     <string name="country_label">Land</string>

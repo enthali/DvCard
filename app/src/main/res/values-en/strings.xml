@@ -4,6 +4,7 @@
     <!-- Card types -->
     <string name="card_type_private">Private</string>
     <string name="card_type_business">Business</string>
+    <string name="card_type_label">Card Type</string>
     
     <!-- Card actions -->
     <string name="qr_code_show">Show QR code</string>
@@ -19,14 +20,16 @@
     <string name="website_prefix">Web: %1$s</string>
     
     <!-- Form labels -->
-    <string name="title_label">Title</string>
+    <string name="title_label">Card Title</string>
+    <string name="title_placeholder">Optional - displayed instead of name if set</string>
     <string name="name_label">Name</string>
     <string name="position_label">Position</string>
     <string name="company_label">Company</string>
     <string name="phone_label">Phone</string>
     <string name="email_label">Email</string>
     <string name="website_label">Website</string>
-    <string name="street_label">Street</string>
+    <string name="address_section_label">Address</string>
+    <string name="street_label">Street and Number</string>
     <string name="postal_code_label">Postal Code</string>
     <string name="city_label">City</string>
     <string name="country_label">Country</string>
