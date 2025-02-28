@@ -1,8 +1,10 @@
 package de.drachenfels.dvcard.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import de.drachenfels.dvcard.R
 import de.drachenfels.dvcard.data.BusinessCardRepository
 import de.drachenfels.dvcard.data.model.BusinessCard
 import de.drachenfels.dvcard.util.logger.Log
@@ -13,45 +15,51 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 /**
- * ViewModel für die Verwaltung der Visitenkarten und UI-Zustände
+ * ViewModel for managing business cards and UI states
  */
-class BusinessCardViewModel(private val repository: BusinessCardRepository) : ViewModel() {
+class BusinessCardViewModel(
+    private val repository: BusinessCardRepository,
+    private val context: Context? = null
+) : ViewModel() {
     
-    // Liste aller Visitenkarten
+    // List of all business cards
     private val _cards = MutableStateFlow<List<BusinessCard>>(emptyList())
     val cards: StateFlow<List<BusinessCard>> = _cards.asStateFlow()
     
-    // QR-Code Dialog Status
+    // QR code dialog state
     private val _qrCodeDialogCard = MutableStateFlow<BusinessCard?>(null)
     val qrCodeDialogCard: StateFlow<BusinessCard?> = _qrCodeDialogCard.asStateFlow()
     
     init {
-        Log.d(LogConfig.TAG_VIEWMODEL, "BusinessCardViewModel initialisiert")
-        // Initialisiere den Flow der Karten aus dem Repository
+        // Initialize the flow of cards from repository
         viewModelScope.launch {
-            Log.d(LogConfig.TAG_VIEWMODEL, "Starte Sammlung von Karten aus Repository")
             repository.allCards.collect { cardList ->
-                Log.d(LogConfig.TAG_VIEWMODEL, "Kartenliste aktualisiert, Anzahl: ${cardList.size}")
                 _cards.value = cardList
+                
+                // Auto-create a card if the list is empty
+                if (cardList.isEmpty()) {
+                    createNewCard()
+                }
             }
         }
     }
     
     /**
-     * Erstellt eine neue Karte direkt in der Datenbank
-     * @return Die ID der neuen Karte, falls erfolgreich erstellt
+     * Creates a new card directly in the database
+     * @return The ID of the new card if successfully created
      */
     fun createNewCard(): Long? {
-        Log.d(LogConfig.TAG_VIEWMODEL, "Erstelle neue Karte")
         var newId: Long? = null
         
+        // Use string resource if context is available, otherwise default to "New Card"
+        val defaultName = context?.getString(R.string.card_add) ?: "New Card"
+        
         viewModelScope.launch {
-            val newCard = BusinessCard(name = "Neue Karte", isExpanded = true)
+            val newCard = BusinessCard(name = defaultName, isExpanded = true)
             try {
                 newId = repository.insertCard(newCard)
-                Log.d(LogConfig.TAG_VIEWMODEL, "Neue Karte erfolgreich gespeichert, ID: $newId")
             } catch (e: Exception) {
-                Log.e(LogConfig.TAG_VIEWMODEL, "Fehler beim Speichern der neuen Karte", e)
+                Log.e(LogConfig.TAG_VIEWMODEL, "Error saving new card", e)
             }
         }
         
@@ -59,70 +67,63 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
     }
     
     /**
-     * Speichert eine Karte (neu oder bearbeitet)
+     * Saves or updates a card
+     * Calls the repository to persist the data
      */
     fun saveCard(card: BusinessCard) {
-        Log.d(LogConfig.TAG_VIEWMODEL, "saveCard aufgerufen mit Karte: ID=${card.id}, Name=${card.name}")
         viewModelScope.launch {
             try {
                 repository.updateCard(card)
-                Log.d(LogConfig.TAG_VIEWMODEL, "Karte erfolgreich aktualisiert")
             } catch (e: Exception) {
-                Log.e(LogConfig.TAG_VIEWMODEL, "Fehler beim Aktualisieren der Karte", e)
+                Log.e(LogConfig.TAG_VIEWMODEL, "Error saving/updating card", e)
             }
         }
-    }
-
-    /**
-     * Aktualisiere lokale LiveData/StateFlow der Karte
-     */
-    fun updateCard(card: BusinessCard) {
-        val updatedCards = _cards.value.map {
-            if (it.id == card.id) card else it
-        }
-        _cards.value = updatedCards
     }
     
     /**
-     * Löscht eine Karte
+     * Deletes a card
      */
     fun deleteCard(card: BusinessCard) {
-        Log.d(LogConfig.TAG_VIEWMODEL, "Lösche Karte: ID=${card.id}, Name=${card.name}")
         viewModelScope.launch {
             try {
                 repository.deleteCard(card)
-                Log.d(LogConfig.TAG_VIEWMODEL, "Karte erfolgreich gelöscht")
+                
+                // If this was the last card, create a new one
+                if (_cards.value.size <= 1) {
+                    createNewCard()
+                }
             } catch (e: Exception) {
-                Log.e(LogConfig.TAG_VIEWMODEL, "Fehler beim Löschen der Karte", e)
+                Log.e(LogConfig.TAG_VIEWMODEL, "Error deleting card", e)
             }
         }
     }
 
     /**
-     * Öffnet den QR-Code Dialog für eine Karte
+     * Opens the QR code dialog for a card
      */
     fun showQrCode(card: BusinessCard) {
-        Log.d(LogConfig.TAG_VIEWMODEL, "Zeige QR-Code für Karte: ID=${card.id}, Name=${card.name}")
         _qrCodeDialogCard.value = card
     }
     
     /**
-     * Schließt den QR-Code Dialog
+     * Closes the QR code dialog
      */
     fun dismissQrCode() {
-        Log.d(LogConfig.TAG_VIEWMODEL, "Schließe QR-Code Dialog")
         _qrCodeDialogCard.value = null
     }
 }
 
 /**
- * Factory für die Erstellung des ViewModels mit Repository-Abhängigkeit
+ * Factory for creating the ViewModel with repository dependency
  */
-class BusinessCardViewModelFactory(private val repository: BusinessCardRepository) : ViewModelProvider.Factory {
+class BusinessCardViewModelFactory(
+    private val repository: BusinessCardRepository,
+    private val context: Context? = null
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(BusinessCardViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return BusinessCardViewModel(repository) as T
+            return BusinessCardViewModel(repository, context) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

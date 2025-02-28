@@ -107,9 +107,9 @@ Die folgenden Optimierungen sind für zukünftige Entwicklungszyklen geplant:
 - ✅ i18n einführen von strings in der string.xml für englisch und deutsch.
 
 ### 3. BusinessCardViewModel.kt - Redundante Methoden vereinfachen
-- Zusammenführen von `saveCard()` und `updateCard()` 
-- Reduzierung der Log-Ausgaben für übersichtlicheren Code
-- Prüfen, ob lokale `updateCard` und Repository-Update zusammengeführt werden können
+- ✅ Zusammenführen von `saveCard()` und `updateCard()` 
+- ✅ Reduzierung der Log-Ausgaben für übersichtlicheren Code
+- ✅ Prüfen, ob lokale `updateCard` und Repository-Update zusammengeführt werden können
 
 ### 4. MainScreen.kt - Vereinfachung
 - Code-Duplikation bei Erstellung neuer Karten beseitigen

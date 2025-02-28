@@ -27,35 +27,35 @@ class MainActivity : ComponentActivity() {
     
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     
-    // Datenbank, Repository und ViewModel initialisieren
+    // Initialize database, repository and ViewModel
     private val database by lazy { 
-        Log.d(LogConfig.TAG_MAIN, "Initialisiere Datenbank")
+        Log.d(LogConfig.TAG_MAIN, "Initializing database")
         BusinessCardDatabase.getDatabase(this) 
     }
     private val repository by lazy { 
-        Log.d(LogConfig.TAG_MAIN, "Initialisiere Repository")
+        Log.d(LogConfig.TAG_MAIN, "Initializing repository")
         BusinessCardRepository(database.businessCardDao()) 
     }
     private val viewModelFactory by lazy { 
-        Log.d(LogConfig.TAG_MAIN, "Initialisiere ViewModelFactory")
-        BusinessCardViewModelFactory(repository) 
+        Log.d(LogConfig.TAG_MAIN, "Initializing ViewModelFactory")
+        BusinessCardViewModelFactory(repository, this) 
     }
     private val viewModel: BusinessCardViewModel by viewModels { 
-        Log.d(LogConfig.TAG_MAIN, "Initialisiere ViewModel")
+        Log.d(LogConfig.TAG_MAIN, "Initializing ViewModel")
         viewModelFactory 
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(LogConfig.TAG_MAIN, "MainActivity.onCreate aufgerufen")
+        Log.d(LogConfig.TAG_MAIN, "MainActivity.onCreate called")
         
         enableEdgeToEdge()
         
-        // Prüfen ob die Datenbank existiert und erreichbar ist
+        // Check if the database exists and is accessible
         checkDatabase()
         
         setContent {
-            Log.d(LogConfig.TAG_MAIN, "Setze Compose-Content")
+            Log.d(LogConfig.TAG_MAIN, "Setting up Compose content")
             DigtalBusinessCardTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -66,48 +66,48 @@ class MainActivity : ComponentActivity() {
             }
         }
         
-        Log.d(LogConfig.TAG_MAIN, "MainActivity.onCreate abgeschlossen")
+        Log.d(LogConfig.TAG_MAIN, "MainActivity.onCreate completed")
     }
     
     override fun onResume() {
         super.onResume()
-        Log.d(LogConfig.TAG_MAIN, "MainActivity.onResume aufgerufen")
+        Log.d(LogConfig.TAG_MAIN, "MainActivity.onResume called")
     }
     
     /**
-     * Überprüft, ob die Datenbank korrekt initialisiert wurde und zeigt eine Meldung an,
-     * wenn ein Problem auftritt.
+     * Checks if the database is correctly initialized and shows a message
+     * if a problem occurs.
      */
     private fun checkDatabase() {
         applicationScope.launch(Dispatchers.IO) {
             try {
                 val dbFile = getDatabasePath("business_card_database")
-                Log.d(LogConfig.TAG_MAIN, "Datenbankpfad: ${dbFile.absolutePath}")
-                Log.d(LogConfig.TAG_MAIN, "Datenbank existiert: ${dbFile.exists()}")
+                Log.d(LogConfig.TAG_MAIN, "Database path: ${dbFile.absolutePath}")
+                Log.d(LogConfig.TAG_MAIN, "Database exists: ${dbFile.exists()}")
                 if (dbFile.exists()) {
-                    Log.d(LogConfig.TAG_MAIN, "Datenbank-Größe: ${dbFile.length()} Bytes")
-                    Log.d(LogConfig.TAG_MAIN, "Datenbank ist beschreibbar: ${dbFile.canWrite()}")
-                    Log.d(LogConfig.TAG_MAIN, "Datenbank ist lesbar: ${dbFile.canRead()}")
+                    Log.d(LogConfig.TAG_MAIN, "Database size: ${dbFile.length()} bytes")
+                    Log.d(LogConfig.TAG_MAIN, "Database is writable: ${dbFile.canWrite()}")
+                    Log.d(LogConfig.TAG_MAIN, "Database is readable: ${dbFile.canRead()}")
                 } else {
-                    // Datenbank existiert nicht, versuche zu initialisieren
-                    Log.w(LogConfig.TAG_MAIN, "Datenbank existiert nicht, versuche zu initialisieren")
+                    // Database doesn't exist, try to initialize
+                    Log.w(LogConfig.TAG_MAIN, "Database doesn't exist, trying to initialize")
                     val dir = dbFile.parentFile
                     if (dir != null && !dir.exists()) {
                         val created = dir.mkdirs()
-                        Log.d(LogConfig.TAG_MAIN, "Datenbank-Verzeichnis erstellt: $created")
+                        Log.d(LogConfig.TAG_MAIN, "Database directory created: $created")
                     }
                     
-                    // Teste Zugriff durch Einfügen einer Test-Abfrage
+                    // Test access by inserting a test query
                     val count = repository.getCardsCount()
-                    Log.d(LogConfig.TAG_MAIN, "Anzahl der Karten in der Datenbank: $count")
+                    Log.d(LogConfig.TAG_MAIN, "Number of cards in database: $count")
                 }
             } catch (e: Exception) {
-                Log.e(LogConfig.TAG_MAIN, "Fehler beim Überprüfen der Datenbank", e)
-                // Auf dem UI-Thread eine Fehlermeldung anzeigen
+                Log.e(LogConfig.TAG_MAIN, "Error checking database", e)
+                // Show an error message on the UI thread
                 launch(Dispatchers.Main) {
                     Toast.makeText(
                         this@MainActivity,
-                        "Fehler beim Zugriff auf die Datenbank: ${e.localizedMessage}",
+                        "Error accessing database: ${e.localizedMessage}",
                         Toast.LENGTH_LONG
                     ).show()
                 }
