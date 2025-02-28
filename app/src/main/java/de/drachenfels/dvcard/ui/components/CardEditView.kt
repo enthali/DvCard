@@ -5,6 +5,7 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -131,45 +132,57 @@ private fun PersonalInfoSection(
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         // Card title
+        var title by remember(card) { mutableStateOf(card.title) }
         OutlinedTextField(
-            value = card.title,
-            onValueChange = { onChange(card.copy(title = it)) },
+            value = title,
+            onValueChange = { title = it },
             label = { Text(stringResource(R.string.title_label)) },
             placeholder = { Text(stringResource(R.string.title_placeholder)) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusEvent{ if (!it.isFocused) onChange(card.copy(title = title)) },
             singleLine = true
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         // Name
+        var name by remember(card) { mutableStateOf(card.name) }
         OutlinedTextField(
-            value = card.name,
-            onValueChange = { onChange(card.copy(name = it)) },
+            value = name,
+            onValueChange = { name = it },
             label = { Text(stringResource(R.string.name_label)) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusEvent{ if (!it.isFocused) onChange(card.copy(name = name)) },
             singleLine = true
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         // Position
+        var position by remember(card) { mutableStateOf(card.position) }
         OutlinedTextField(
-            value = card.position,
-            onValueChange = { onChange(card.copy(position = it)) },
+            value = position,
+            onValueChange = { position = it },
             label = { Text(stringResource(R.string.position_label)) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusEvent{ if (!it.isFocused) onChange(card.copy(position = position)) },
             singleLine = true
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         // Company
+        var company by remember(card) { mutableStateOf(card.company) }
         OutlinedTextField(
-            value = card.company,
-            onValueChange = { onChange(card.copy(company = it)) },
+            value = company,
+            onValueChange = { company = it },
             label = { Text(stringResource(R.string.company_label)) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusEvent{ if (!it.isFocused) onChange(card.copy(company = company)) },
             singleLine = true
         )
     }
@@ -186,33 +199,42 @@ private fun ContactInfoSection(
         Spacer(modifier = Modifier.height(8.dp))
         
         // Phone
+        var phone by remember(card) { mutableStateOf(card.phone) }
         OutlinedTextField(
-            value = card.phone,
-            onValueChange = { onChange(card.copy(phone = it)) },
+            value = phone,
+            onValueChange = { phone = it },
             label = { Text(stringResource(R.string.phone_label)) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusEvent{ if (!it.isFocused) onChange(card.copy(phone = phone)) },
             singleLine = true
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         // Email
+        var email by remember(card) { mutableStateOf(card.email) }
         OutlinedTextField(
-            value = card.email,
-            onValueChange = { onChange(card.copy(email = it)) },
+            value = email,
+            onValueChange = { email = it },
             label = { Text(stringResource(R.string.email_label)) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusEvent{ if (!it.isFocused) onChange(card.copy(email = email)) },
             singleLine = true
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         // Website
+        var website by remember(card) { mutableStateOf(card.website) }
         OutlinedTextField(
-            value = card.website,
-            onValueChange = { onChange(card.copy(website = it)) },
+            value = website,
+            onValueChange = { website = it },
             label = { Text(stringResource(R.string.website_label)) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusEvent{ if (!it.isFocused) onChange(card.copy(website = website)) },
             singleLine = true
         )
     }
@@ -235,11 +257,14 @@ private fun AddressInfoSection(
         )
 
         // Street
+        var street by remember(card) { mutableStateOf(card.street) }
         OutlinedTextField(
-            value = card.street,
-            onValueChange = { onChange(card.copy(street = it)) },
+            value = street,
+            onValueChange = { street = it },
             label = { Text(stringResource(R.string.street_label)) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusEvent{ if (!it.isFocused) onChange(card.copy(street = street)) },
             singleLine = true
         )
 
@@ -250,19 +275,25 @@ private fun AddressInfoSection(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            var postalCode by remember(card) { mutableStateOf(card.postalCode) }
             OutlinedTextField(
-                value = card.postalCode,
-                onValueChange = { onChange(card.copy(postalCode = it)) },
+                value = postalCode,
+                onValueChange = { postalCode = it },
                 label = { Text(stringResource(R.string.postal_code_label)) },
-                modifier = Modifier.weight(0.4f),
+                modifier = Modifier
+                    .weight(0.4f)
+                    .onFocusEvent{ if (!it.isFocused) onChange(card.copy(postalCode = postalCode)) },
                 singleLine = true
             )
 
+            var city by remember(card) { mutableStateOf(card.city) }
             OutlinedTextField(
-                value = card.city,
-                onValueChange = { onChange(card.copy(city = it)) },
+                value = city,
+                onValueChange = { city = it },
                 label = { Text(stringResource(R.string.city_label)) },
-                modifier = Modifier.weight(0.6f),
+                modifier = Modifier
+                    .weight(0.6f)
+                    .onFocusEvent{ if (!it.isFocused) onChange(card.copy(city = city)) },
                 singleLine = true
             )
         }
@@ -270,11 +301,14 @@ private fun AddressInfoSection(
         Spacer(modifier = Modifier.height(8.dp))
 
         // Country
+        var country by remember(card) { mutableStateOf(card.country) }
         OutlinedTextField(
-            value = card.country,
-            onValueChange = { onChange(card.copy(country = it)) },
+            value = country,
+            onValueChange = { country = it },
             label = { Text(stringResource(R.string.country_label)) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusEvent{ if (!it.isFocused) onChange(card.copy(country = country)) },
             singleLine = true
         )
     }
