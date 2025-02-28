@@ -93,5 +93,56 @@ de.drachenfels.dvcard/
 3. Sync Gradle files
 4. Build und Run
 
+## Geplante Code-Optimierungen (KISS-Prinzip)
+
+Die folgenden Optimierungen sind für zukünftige Entwicklungszyklen geplant:
+
+### 1. CardEditView.kt - Vereinfachung der Callback-Struktur
+- ✅ Parameter für `onDeleteClick` zu nullable geändert (`onDeleteClick: (() -> Unit)?`)
+
+### 2. CardItem.kt - Unnötige Verschachtelung reduzieren
+- Verschachtelung von Layouts reduzieren
+- UI-Komponenten in kleinere Funktionen extrahieren
+- Beispiel: Card-Header, Card-Content und Card-Footer als separate Composables
+
+### 3. BusinessCardViewModel.kt - Redundante Methoden vereinfachen
+- Zusammenführen von `saveCard()` und `updateCard()` 
+- Reduzierung der Log-Ausgaben für übersichtlicheren Code
+- Prüfen, ob lokale `updateCard` und Repository-Update zusammengeführt werden können
+
+### 4. MainScreen.kt - Vereinfachung
+- Code-Duplikation bei Erstellung neuer Karten beseitigen
+- QR-Code-Anzeige und About-Dialog-Logik in separate Composables extrahieren
+- Vereinfachung der Bedingungsprüfung für leere Kartenliste
+
+### 5. VCardGenerator.kt - Robustere Implementierung
+- Sicherstellen, dass Sonderzeichen in der vCard-Generierung korrekt behandelt werden
+- Escaping von Semikolons, Kommas und anderen speziellen Zeichen nach vCard-Spezifikation
+- Bessere Fehlerbehandlung bei der QR-Code-Generierung
+
+### 6. Optimierung der Datenflüsse
+- Vereinfachung der Datenflüsse zwischen ViewModel und UI
+- Prüfen, ob `StateFlow` überall nötig ist oder ob einfachere Lösungen ausreichen
+- Konsistente Strategie für UI-Updates nach Datenänderungen
+
+### 7. Logging-Optimierung
+- Einführung von Log-Levels (DEBUG, INFO, ERROR) 
+- Reduzierung der Log-Ausgaben für Produktionsnutzung
+- Konfigurierbarkeit des Logging-Verhaltens je nach Build-Typ
+
+### 8. Unnötige Preview-Funktionen zusammenführen
+- Gemeinsamen Code der Preview-Funktionen extrahieren
+- Parameterisierte Preview-Funktionen für verschiedene Karten-Szenarien
+
+### 9. Redundante Initialisierung im MainActivity
+- Auslagern der Initialisierungslogik in eigene Initializer-Klassen
+- Anwendung von Lazy-Loading-Prinzipien
+- Prüfen, ob Dagger/Hilt für Dependency Injection sinnvoll wäre
+
+### 10. Bessere Fehlerbehandlung
+- Einheitliche Strategie für Fehlerbehandlung im gesamten Projekt
+- Nutzerfreundliche Fehlermeldungen für häufige Fehlerszenarien
+- Implementierung von Recovery-Mechanismen für nicht-kritische Fehler
+
 ## Lizenz
 [MIT License](LICENSE)
