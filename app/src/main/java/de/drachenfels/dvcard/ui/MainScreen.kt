@@ -4,8 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
@@ -60,13 +58,11 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
             )
         },
         floatingActionButton = {
-            if (editMode !is BusinessCardViewModel.CardEditState.Creating) {
-                FloatingActionButton(onClick = {
-                    Log.d(LogConfig.TAG_UI, "FAB geklickt - Neue Karte erstellen")
-                    viewModel.createNewCard()
-                }) {
-                    Icon(Icons.Filled.Add, contentDescription = "Neue Karte hinzufügen")
-                }
+            FloatingActionButton(onClick = {
+                Log.d(LogConfig.TAG_UI, "FAB geklickt - Neue Karte erstellen")
+                viewModel.createNewCard()
+            }) {
+                Icon(Icons.Filled.Add, contentDescription = "Neue Karte hinzufügen")
             }
         }
     ) { paddingValues ->
@@ -75,42 +71,8 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Anzeige des Erstellungsdialogs, wenn der Modus "Creating" ist
-            if (editMode is BusinessCardViewModel.CardEditState.Creating && selectedCard != null) {
-                Log.d(LogConfig.TAG_UI, "Zeige Creating-Dialog für neue Karte")
-
-                val scrollState = rememberScrollState()
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(scrollState)
-                        .padding(16.dp)
-                ) {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = "Neue Visitenkarte",
-                                style = MaterialTheme.typography.titleLarge
-                            )
-
-                            de.drachenfels.dvcard.ui.components.CardEditView(
-                                card = selectedCard!!,
-                                onSaveClick = { card ->
-                                    Log.d(LogConfig.TAG_UI, "Save-Button für neue Karte geklickt")
-                                    viewModel.saveCard(card)
-                                },
-                                onDeleteClick = null,  // Keine Löschoption bei Neuanlage
-                                onCancel = null  // Kein Cancel-Button mehr
-                            )
-                        }
-                    }
-                }
-            } else if (cards.isEmpty()) {
-                // Anzeige, wenn keine Karten vorhanden sind und kein Erstellungsdialog aktiv ist
+            if (cards.isEmpty()) {
+                // Anzeige, wenn keine Karten vorhanden sind
                 Log.d(LogConfig.TAG_UI, "Keine Karten vorhanden, zeige EmptyState")
                 EmptyState(
                     onCreateClick = {
@@ -235,13 +197,11 @@ fun EmptyState(onCreateClick: () -> Unit, modifier: Modifier = Modifier) {
 fun MainScreenPreviewContent(
     cards: List<BusinessCard>,
     editingCardId: Long? = null,
-    isCreatingCard: Boolean = false,
     selectedCard: BusinessCard? = null,
     qrCodeCard: BusinessCard? = null
 ) {
     // UI-Zustandssimulation für Previews
     val previewEditMode = when {
-        isCreatingCard -> BusinessCardViewModel.CardEditState.Creating
         editingCardId != null -> BusinessCardViewModel.CardEditState.Editing(editingCardId)
         else -> BusinessCardViewModel.CardEditState.Closed
     }
@@ -268,8 +228,17 @@ fun MainScreenPreviewContent(
             }
 
             fun createNewCard() {
-                selectedCardState.value = BusinessCard()
-                editModeState.value = BusinessCardViewModel.CardEditState.Creating
+                // Simuliere die direkte Erstellung einer neuen Karte
+                val newCard = BusinessCard(
+                    id = (cardsState.value.maxOfOrNull { it.id } ?: 0) + 1,
+                    name = "Neue Karte"
+                )
+                val updatedCards = cardsState.value.toMutableList()
+                updatedCards.add(newCard)
+                cardsState.value = updatedCards
+                
+                selectedCardState.value = newCard
+                editModeState.value = BusinessCardViewModel.CardEditState.Editing(newCard.id)
             }
 
             fun editCard(card: BusinessCard) {

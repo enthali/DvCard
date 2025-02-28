@@ -46,13 +46,26 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
     }
     
     /**
-     * Erstellt eine neue leere Karte und öffnet den Bearbeitungsmodus
+     * Erstellt eine neue Karte direkt in der Datenbank und öffnet sie im Bearbeitungsmodus
      */
     fun createNewCard() {
-        Log.d(LogConfig.TAG_VIEWMODEL, "Erstelle neue Karte")
-        _selectedCard.value = BusinessCard()
-        _cardEditMode.value = CardEditState.Creating
-        Log.d(LogConfig.TAG_VIEWMODEL, "Edit-Modus auf CREATING gesetzt")
+        Log.d(LogConfig.TAG_VIEWMODEL, "Erstelle neue Karte direkt in der Datenbank")
+        viewModelScope.launch {
+            val newCard = BusinessCard(name = "Neue Karte")
+            try {
+                val newId = repository.insertCard(newCard)
+                Log.d(LogConfig.TAG_VIEWMODEL, "Neue Karte erfolgreich gespeichert, ID: $newId")
+                
+                // Warten bis die Karte in der Liste erscheint
+                repository.getCardById(newId)?.let { savedCard ->
+                    _selectedCard.value = savedCard
+                    _cardEditMode.value = CardEditState.Editing(newId)
+                    Log.d(LogConfig.TAG_VIEWMODEL, "Edit-Modus auf EDITING für neue Karte gesetzt")
+                }
+            } catch (e: Exception) {
+                Log.e(LogConfig.TAG_VIEWMODEL, "Fehler beim Speichern der neuen Karte", e)
+            }
+        }
     }
     
     /**
@@ -79,28 +92,11 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
     fun saveCard(card: BusinessCard) {
         Log.d(LogConfig.TAG_VIEWMODEL, "saveCard aufgerufen mit Karte: ID=${card.id}, Name=${card.name}")
         viewModelScope.launch {
-            when (val currentMode = _cardEditMode.value) {
-                is CardEditState.Creating -> {
-                    Log.d(LogConfig.TAG_VIEWMODEL, "Speichere neue Karte (Creating-Modus)")
-                    try {
-                        val newId = repository.insertCard(card)
-                        Log.d(LogConfig.TAG_VIEWMODEL, "Neue Karte erfolgreich gespeichert, ID: $newId")
-                    } catch (e: Exception) {
-                        Log.e(LogConfig.TAG_VIEWMODEL, "Fehler beim Speichern der neuen Karte", e)
-                    }
-                }
-                is CardEditState.Editing -> {
-                    Log.d(LogConfig.TAG_VIEWMODEL, "Aktualisiere bestehende Karte (Editing-Modus)")
-                    try {
-                        repository.updateCard(card)
-                        Log.d(LogConfig.TAG_VIEWMODEL, "Karte erfolgreich aktualisiert")
-                    } catch (e: Exception) {
-                        Log.e(LogConfig.TAG_VIEWMODEL, "Fehler beim Aktualisieren der Karte", e)
-                    }
-                }
-                else -> {
-                    Log.w(LogConfig.TAG_VIEWMODEL, "Unerwarteter Modus beim Speichern: $currentMode")
-                }
+            try {
+                repository.updateCard(card)
+                Log.d(LogConfig.TAG_VIEWMODEL, "Karte erfolgreich aktualisiert")
+            } catch (e: Exception) {
+                Log.e(LogConfig.TAG_VIEWMODEL, "Fehler beim Aktualisieren der Karte", e)
             }
             closeEdit()
         }
@@ -143,7 +139,7 @@ class BusinessCardViewModel(private val repository: BusinessCardRepository) : Vi
      */
     sealed class CardEditState {
         object Closed : CardEditState()
-        object Creating : CardEditState()
+        object Creating : CardEditState() // Belassen für Abwärtskompatibilität, wird aber nicht mehr verwendet
         data class Editing(val cardId: Long) : CardEditState()
     }
 }
