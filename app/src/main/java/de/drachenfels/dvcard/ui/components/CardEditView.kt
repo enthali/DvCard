@@ -22,7 +22,7 @@ import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
 @Composable
 fun CardEditView(
     card: BusinessCard,
-    onDeleteClick: () -> Unit,
+    onDeleteClick: (() -> Unit)?,
     onChange: (BusinessCard) -> Unit // Generischer Callback
 ) {
     // Hier müssen wir card als Key für remember verwenden, damit die Werte
