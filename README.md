@@ -101,9 +101,10 @@ Die folgenden Optimierungen sind für zukünftige Entwicklungszyklen geplant:
 - ✅ Parameter für `onDeleteClick` zu nullable geändert (`onDeleteClick: (() -> Unit)?`)
 
 ### 2. CardItem.kt - Unnötige Verschachtelung reduzieren
-- Verschachtelung von Layouts reduzieren
-- UI-Komponenten in kleinere Funktionen extrahieren
-- Beispiel: Card-Header, Card-Content und Card-Footer als separate Composables
+- ✅ Verschachtelung von Layouts reduzieren
+- ✅ UI-Komponenten in kleinere Funktionen extrahieren
+- ✅ Beispiel: Card-Header, Card-Content und Card-Footer als separate Composables
+- ✅ i18n einführen von strings in der string.xml für englisch und deutsch.
 
 ### 3. BusinessCardViewModel.kt - Redundante Methoden vereinfachen
 - Zusammenführen von `saveCard()` und `updateCard()` 

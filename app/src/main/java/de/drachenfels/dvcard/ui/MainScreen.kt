@@ -33,9 +33,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import de.drachenfels.dvcard.R
 import de.drachenfels.dvcard.ui.components.AboutDialog
 import de.drachenfels.dvcard.ui.components.CardItem
 import de.drachenfels.dvcard.ui.components.QrCodeDialog
@@ -46,116 +48,85 @@ import de.drachenfels.dvcard.viewmodel.BusinessCardViewModel
 import kotlinx.coroutines.launch
 
 /**
- * Hauptbildschirm der App mit Liste aller Visitenkarten
+ * Main screen of the app with list of all business cards
  *
- * @param viewModel ViewModel für die Datenverwaltung
+ * @param viewModel ViewModel for data management
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(viewModel: BusinessCardViewModel) {
-    Log.d(LogConfig.TAG_UI, "MainScreen Composable wird ausgeführt")
+    Log.d(LogConfig.TAG_UI, "MainScreen Composable is being executed")
 
     val cards by viewModel.cards.collectAsState()
     val qrCodeCard by viewModel.qrCodeDialogCard.collectAsState()
     val scope = rememberCoroutineScope()
 
-    // State für den About-Dialog
+    // State for the About dialog
     var showAboutDialog by remember { mutableStateOf(false) }
 
     Log.d(LogConfig.TAG_UI, "MainScreen State: cards=${cards.size}")
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Digitale Visitenkarte",
-                        modifier = Modifier.clickable {
-                            Log.d(LogConfig.TAG_UI, "App-Titel geklickt - Zeige About-Dialog")
-                            showAboutDialog = true
-                        }
-                    )
+            AppTopBar(
+                onTitleClick = {
+                    Log.d(LogConfig.TAG_UI, "App title clicked - Show About dialog")
+                    showAboutDialog = true
                 }
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                Log.d(LogConfig.TAG_UI, "FAB geklickt - Neue Karte erstellen")
-                
-                scope.launch {
-                    val id = viewModel.createNewCard()
-                }
-            }) {
-                Icon(Icons.Filled.Add, contentDescription = "Neue Karte hinzufügen")
-            }
-        }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            if (cards.isEmpty()) {
-                // Anzeige, wenn keine Karten vorhanden sind
-                Log.d(LogConfig.TAG_UI, "Keine Karten vorhanden, zeige EmptyState")
-                EmptyState(
-                    onCreateClick = {
-                        Log.d(LogConfig.TAG_UI, "EmptyState-Button geklickt - Neue Karte erstellen")
-                        scope.launch {
-                            val id = viewModel.createNewCard()
-                        }
-                    },
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else {
-                // Liste der Karten
-                Log.d(LogConfig.TAG_UI, "Zeige Kartenliste mit ${cards.size} Karten")
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    contentPadding = PaddingValues(vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(cards) { card ->
-                        CardItem(
-                            card = card,
-                            onQrCodeClick = {
-                                Log.d(LogConfig.TAG_UI, "QR-Code-Button geklickt für Karte ${card.id}")
-                                viewModel.showQrCode(card)
-                            },
-                            onDeleteClick = {
-                                Log.d(LogConfig.TAG_UI, "Delete-Button geklickt für Karte ${card.id}")
-                                viewModel.deleteCard(card)
-                            },
-                            onChange = { updatedCard ->
-                                viewModel.saveCard(updatedCard) // Speichern in DB
-                                viewModel.updateCard(updatedCard) // UI aktualisieren
-                            }
-                        )
+            AddCardFab(
+                onClick = {
+                    Log.d(LogConfig.TAG_UI, "FAB clicked - Create new card")
+                    scope.launch {
+                        viewModel.createNewCard()
                     }
                 }
-            }
+            )
         }
+    ) { paddingValues ->
+        MainContent(
+            cards = cards,
+            paddingValues = paddingValues,
+            onCreateCardClick = {
+                Log.d(LogConfig.TAG_UI, "EmptyState button clicked - Create new card")
+                scope.launch {
+                    viewModel.createNewCard()
+                }
+            },
+            onQrCodeClick = { card ->
+                Log.d(LogConfig.TAG_UI, "QR code button clicked for card ${card.id}")
+                viewModel.showQrCode(card)
+            },
+            onDeleteClick = { card ->
+                Log.d(LogConfig.TAG_UI, "Delete button clicked for card ${card.id}")
+                viewModel.deleteCard(card)
+            },
+            onCardChange = { updatedCard ->
+                viewModel.saveCard(updatedCard) // Save to DB
+                viewModel.updateCard(updatedCard) // Update UI
+            }
+        )
 
-        // QR-Code Dialog anzeigen, wenn eine Karte ausgewählt ist
-        if (qrCodeCard != null) {
-            Log.d(LogConfig.TAG_UI, "Zeige QR-Code-Dialog für Karte ${qrCodeCard?.id}")
+        // Show QR code dialog if a card is selected
+        qrCodeCard?.let { card ->
+            Log.d(LogConfig.TAG_UI, "Show QR code dialog for card ${card.id}")
             QrCodeDialog(
-                card = qrCodeCard!!,
+                card = card,
                 onDismiss = {
-                    Log.d(LogConfig.TAG_UI, "QR-Code-Dialog geschlossen")
+                    Log.d(LogConfig.TAG_UI, "QR code dialog closed")
                     viewModel.dismissQrCode()
                 }
             )
         }
 
-        // About-Dialog anzeigen, wenn auf den App-Titel geklickt wurde
+        // Show About dialog if clicked on app title
         if (showAboutDialog) {
-            Log.d(LogConfig.TAG_UI, "Zeige About-Dialog")
+            Log.d(LogConfig.TAG_UI, "Show About dialog")
             AboutDialog(
                 onDismiss = {
-                    Log.d(LogConfig.TAG_UI, "About-Dialog geschlossen")
+                    Log.d(LogConfig.TAG_UI, "About dialog closed")
                     showAboutDialog = false
                 }
             )
@@ -164,18 +135,112 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
 }
 
 /**
- * Anzeige, wenn keine Karten vorhanden sind
+ * Top app bar with title
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AppTopBar(onTitleClick: () -> Unit) {
+    TopAppBar(
+        title = {
+            Text(
+                text = stringResource(R.string.app_title),
+                modifier = Modifier.clickable(onClick = onTitleClick)
+            )
+        }
+    )
+}
+
+/**
+ * Floating action button to add a new card
+ */
+@Composable
+private fun AddCardFab(onClick: () -> Unit) {
+    FloatingActionButton(onClick = onClick) {
+        Icon(
+            Icons.Filled.Add,
+            contentDescription = stringResource(R.string.add_card)
+        )
+    }
+}
+
+/**
+ * Main content of the screen (either empty state or card list)
+ */
+@Composable
+private fun MainContent(
+    cards: List<de.drachenfels.dvcard.data.model.BusinessCard>,
+    paddingValues: PaddingValues,
+    onCreateCardClick: () -> Unit,
+    onQrCodeClick: (de.drachenfels.dvcard.data.model.BusinessCard) -> Unit,
+    onDeleteClick: (de.drachenfels.dvcard.data.model.BusinessCard) -> Unit,
+    onCardChange: (de.drachenfels.dvcard.data.model.BusinessCard) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+    ) {
+        if (cards.isEmpty()) {
+            // Show empty state if no cards are available
+            Log.d(LogConfig.TAG_UI, "No cards available, show EmptyState")
+            EmptyState(
+                onCreateClick = onCreateCardClick,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        } else {
+            // Show list of cards
+            Log.d(LogConfig.TAG_UI, "Show card list with ${cards.size} cards")
+            CardList(
+                cards = cards,
+                onQrCodeClick = onQrCodeClick,
+                onDeleteClick = onDeleteClick,
+                onCardChange = onCardChange
+            )
+        }
+    }
+}
+
+/**
+ * List of business cards
+ */
+@Composable
+private fun CardList(
+    cards: List<de.drachenfels.dvcard.data.model.BusinessCard>,
+    onQrCodeClick: (de.drachenfels.dvcard.data.model.BusinessCard) -> Unit,
+    onDeleteClick: (de.drachenfels.dvcard.data.model.BusinessCard) -> Unit,
+    onCardChange: (de.drachenfels.dvcard.data.model.BusinessCard) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        contentPadding = PaddingValues(vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(cards) { card ->
+            CardItem(
+                card = card,
+                onQrCodeClick = { onQrCodeClick(card) },
+                onDeleteClick = { onDeleteClick(card) },
+                onChange = onCardChange
+            )
+        }
+    }
+}
+
+/**
+ * Empty state when no cards are available
  */
 @Composable
 fun EmptyState(onCreateClick: () -> Unit, modifier: Modifier = Modifier) {
-    Log.d(LogConfig.TAG_UI, "EmptyState Composable wird ausgeführt")
+    Log.d(LogConfig.TAG_UI, "EmptyState Composable is being executed")
     Column(
         modifier = modifier.padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Keine Visitenkarten vorhanden",
+            text = stringResource(R.string.empty_state_title),
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center
         )
@@ -183,7 +248,7 @@ fun EmptyState(onCreateClick: () -> Unit, modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Erstellen Sie Ihre erste digitale Visitenkarte, um einen QR-Code zu generieren.",
+            text = stringResource(R.string.empty_state_description),
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -197,20 +262,20 @@ fun EmptyState(onCreateClick: () -> Unit, modifier: Modifier = Modifier) {
                 modifier = Modifier.size(ButtonDefaults.IconSize)
             )
             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text("Visitenkarte erstellen")
+            Text(stringResource(R.string.create_card))
         }
     }
 }
 
-// Preview für den EmptyState
-@Preview(showBackground = true, name = "Leerer Zustand")
+// Preview for the EmptyState
+@Preview(showBackground = true, name = "Empty State")
 @Composable
 fun EmptyStatePreview() {
     DigtalBusinessCardTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             Box(modifier = Modifier.fillMaxSize()) {
                 EmptyState(
-                    onCreateClick = { /* Dummy-Callback */ },
+                    onCreateClick = { /* Dummy callback */ },
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
