@@ -15,19 +15,19 @@ import de.drachenfels.dvcard.util.logger.LogConfig
 
 /**
  * Composable für die Bearbeitung einer Visitenkarte
- * 
+ *
  * @param card Die zu bearbeitende Visitenkarte
  * @param onSaveClick Callback wenn die Karte gespeichert wird
- * @param onDeleteClick Callback wenn die Karte gelöscht wird (null = keine Löschfunktion)
- * @param onCancel Callback wenn die Bearbeitung abgebrochen wird
+ * @param onDeleteClick Callback wenn die Karte gelöscht wird (null = keine Löschfunktion) - wird nicht mehr verwendet
+ * @param onCancel Callback wenn die Bearbeitung abgebrochen wird (null = keine Abbruch-Funktion) - wird nicht mehr verwendet
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardEditView(
     card: BusinessCard,
     onSaveClick: (BusinessCard) -> Unit,
-    onDeleteClick: (() -> Unit)?,
-    onCancel: () -> Unit
+    onDeleteClick: (() -> Unit)?, // Wird nicht mehr verwendet
+    onCancel: (() -> Unit)? // Wird nicht mehr verwendet
 ) {
     var title by remember { mutableStateOf(card.title) }
     var name by remember { mutableStateOf(card.name) }
@@ -36,28 +36,28 @@ fun CardEditView(
     var phone by remember { mutableStateOf(card.phone) }
     var email by remember { mutableStateOf(card.email) }
     var website by remember { mutableStateOf(card.website) }
-    
+
     var street by remember { mutableStateOf(card.street) }
     var postalCode by remember { mutableStateOf(card.postalCode) }
     var city by remember { mutableStateOf(card.city) }
     var country by remember { mutableStateOf(card.country) }
-    
+
     var isPrivate by remember { mutableStateOf(card.isPrivate) }
-    
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 16.dp)
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
     ) {
         HorizontalDivider(modifier = Modifier.padding(bottom = 16.dp))
-        
+
         // Kartentyp-Auswahl mit Segmented Control
         Text(
             text = "Kartentyp",
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        
+
         // Segmented Control für Kartentyp
         Row(
             modifier = Modifier
@@ -78,7 +78,7 @@ fun CardEditView(
             ) {
                 Text("Geschäftlich")
             }
-            
+
             // Privat Button
             OutlinedButton(
                 onClick = { isPrivate = true },
@@ -92,7 +92,7 @@ fun CardEditView(
                 Text("Privat")
             }
         }
-        
+
         // Eingabefelder
         OutlinedTextField(
             value = title,
@@ -102,9 +102,9 @@ fun CardEditView(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
@@ -112,9 +112,9 @@ fun CardEditView(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         OutlinedTextField(
             value = position,
             onValueChange = { position = it },
@@ -122,9 +122,9 @@ fun CardEditView(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         OutlinedTextField(
             value = company,
             onValueChange = { company = it },
@@ -132,9 +132,9 @@ fun CardEditView(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         OutlinedTextField(
             value = phone,
             onValueChange = { phone = it },
@@ -142,9 +142,9 @@ fun CardEditView(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -152,9 +152,9 @@ fun CardEditView(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         OutlinedTextField(
             value = website,
             onValueChange = { website = it },
@@ -162,7 +162,7 @@ fun CardEditView(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
-        
+
         // Neue Adressfelder
         Spacer(modifier = Modifier.height(8.dp))
         Text(
@@ -170,7 +170,7 @@ fun CardEditView(
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(vertical = 8.dp)
         )
-        
+
         OutlinedTextField(
             value = street,
             onValueChange = { street = it },
@@ -178,9 +178,9 @@ fun CardEditView(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -192,7 +192,7 @@ fun CardEditView(
                 modifier = Modifier.weight(0.4f),
                 singleLine = true
             )
-            
+
             OutlinedTextField(
                 value = city,
                 onValueChange = { city = it },
@@ -201,9 +201,9 @@ fun CardEditView(
                 singleLine = true
             )
         }
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         OutlinedTextField(
             value = country,
             onValueChange = { country = it },
@@ -211,33 +211,13 @@ fun CardEditView(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
-        
-        // Aktionsbuttons
-        Row(
+
+        // Speichern-Button (nun allein in Mitte)
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(top = 16.dp)
         ) {
-            TextButton(
-                onClick = onCancel,
-                modifier = Modifier.weight(1f)
-            ) {
-                Text("Abbrechen")
-            }
-            
-            if (onDeleteClick != null) {
-                Button(
-                    onClick = onDeleteClick,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    ),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Löschen")
-                }
-            }
-            
             Button(
                 onClick = {
                     Log.d(LogConfig.TAG_UI, "Speichere Karte: ${card.id}")
@@ -258,7 +238,7 @@ fun CardEditView(
                         )
                     )
                 },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.align(Alignment.Center)
             ) {
                 Text("Speichern")
             }
@@ -294,8 +274,8 @@ fun CardEditViewPreview() {
             CardEditView(
                 card = sampleCard,
                 onSaveClick = {},
-                onDeleteClick = {},
-                onCancel = {}
+                onDeleteClick = null,
+                onCancel = null
             )
         }
     }
@@ -313,7 +293,7 @@ fun NewCardEditViewPreview() {
                 card = BusinessCard(), // Leere Karte
                 onSaveClick = {},
                 onDeleteClick = null, // Keine Löschfunktion
-                onCancel = {}
+                onCancel = null
             )
         }
     }
@@ -330,8 +310,8 @@ fun PrivateCardEditViewPreview() {
             CardEditView(
                 card = sampleCard.copy(isPrivate = true),
                 onSaveClick = {},
-                onDeleteClick = {},
-                onCancel = {}
+                onDeleteClick = null,
+                onCancel = null
             )
         }
     }

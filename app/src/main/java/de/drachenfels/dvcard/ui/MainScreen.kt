@@ -34,36 +34,36 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun MainScreen(viewModel: BusinessCardViewModel) {
     Log.d(LogConfig.TAG_UI, "MainScreen Composable wird ausgeführt")
-    
+
     val cards by viewModel.cards.collectAsState()
     val editMode by viewModel.cardEditMode.collectAsState()
     val selectedCard by viewModel.selectedCard.collectAsState()
     val qrCodeCard by viewModel.qrCodeDialogCard.collectAsState()
-    
+
     // State für den About-Dialog
     var showAboutDialog by remember { mutableStateOf(false) }
-    
+
     Log.d(LogConfig.TAG_UI, "MainScreen State: cards=${cards.size}, editMode=$editMode, selectedCard=${selectedCard?.id}")
-    
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { 
+                title = {
                     Text(
                         text = "Digitale Visitenkarte",
-                        modifier = Modifier.clickable { 
+                        modifier = Modifier.clickable {
                             Log.d(LogConfig.TAG_UI, "App-Titel geklickt - Zeige About-Dialog")
-                            showAboutDialog = true 
+                            showAboutDialog = true
                         }
-                    ) 
+                    )
                 }
             )
         },
         floatingActionButton = {
             if (editMode !is BusinessCardViewModel.CardEditState.Creating) {
-                FloatingActionButton(onClick = { 
+                FloatingActionButton(onClick = {
                     Log.d(LogConfig.TAG_UI, "FAB geklickt - Neue Karte erstellen")
-                    viewModel.createNewCard() 
+                    viewModel.createNewCard()
                 }) {
                     Icon(Icons.Filled.Add, contentDescription = "Neue Karte hinzufügen")
                 }
@@ -78,9 +78,9 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
             // Anzeige des Erstellungsdialogs, wenn der Modus "Creating" ist
             if (editMode is BusinessCardViewModel.CardEditState.Creating && selectedCard != null) {
                 Log.d(LogConfig.TAG_UI, "Zeige Creating-Dialog für neue Karte")
-                
+
                 val scrollState = rememberScrollState()
-                
+
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -96,18 +96,15 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                                 text = "Neue Visitenkarte",
                                 style = MaterialTheme.typography.titleLarge
                             )
-                            
+
                             de.drachenfels.dvcard.ui.components.CardEditView(
                                 card = selectedCard!!,
-                                onSaveClick = { card -> 
+                                onSaveClick = { card ->
                                     Log.d(LogConfig.TAG_UI, "Save-Button für neue Karte geklickt")
-                                    viewModel.saveCard(card) 
+                                    viewModel.saveCard(card)
                                 },
                                 onDeleteClick = null,  // Keine Löschoption bei Neuanlage
-                                onCancel = { 
-                                    Log.d(LogConfig.TAG_UI, "Cancel-Button für neue Karte geklickt")
-                                    viewModel.closeEdit() 
-                                }
+                                onCancel = null  // Kein Cancel-Button mehr
                             )
                         }
                     }
@@ -116,9 +113,9 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                 // Anzeige, wenn keine Karten vorhanden sind und kein Erstellungsdialog aktiv ist
                 Log.d(LogConfig.TAG_UI, "Keine Karten vorhanden, zeige EmptyState")
                 EmptyState(
-                    onCreateClick = { 
+                    onCreateClick = {
                         Log.d(LogConfig.TAG_UI, "EmptyState-Button geklickt - Neue Karte erstellen")
-                        viewModel.createNewCard() 
+                        viewModel.createNewCard()
                     },
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -134,59 +131,59 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                 ) {
                     items(cards) { card ->
                         val isExpanded = when (val mode = editMode) {
-                            is BusinessCardViewModel.CardEditState.Editing -> 
+                            is BusinessCardViewModel.CardEditState.Editing ->
                                 mode.cardId == card.id
                             else -> false
                         }
-                        
+
                         CardItem(
                             card = card,
                             isExpanded = isExpanded,
-                            onEditClick = { 
-                                Log.d(LogConfig.TAG_UI, "Edit-Button geklickt für Karte ${card.id}")
-                                viewModel.editCard(card) 
+                            onExpandClick = {
+                                Log.d(LogConfig.TAG_UI, "Expand-Button geklickt für Karte ${card.id}")
+                                viewModel.editCard(card)
                             },
-                            onQrCodeClick = { 
+                            onCollapseClick = { updatedCard ->
+                                Log.d(LogConfig.TAG_UI, "Collapse-Button geklickt für Karte ${card.id}")
+                                viewModel.saveCard(updatedCard)
+                            },
+                            onQrCodeClick = {
                                 Log.d(LogConfig.TAG_UI, "QR-Code-Button geklickt für Karte ${card.id}")
-                                viewModel.showQrCode(card) 
+                                viewModel.showQrCode(card)
                             },
-                            onSaveClick = { updatedCard -> 
+                            onSaveClick = { updatedCard ->
                                 Log.d(LogConfig.TAG_UI, "Save-Button geklickt für Karte ${card.id}")
-                                viewModel.saveCard(updatedCard) 
+                                viewModel.saveCard(updatedCard)
                             },
-                            onDeleteClick = { 
+                            onDeleteClick = {
                                 Log.d(LogConfig.TAG_UI, "Delete-Button geklickt für Karte ${card.id}")
-                                viewModel.deleteCard(card) 
-                            },
-                            onCancel = { 
-                                Log.d(LogConfig.TAG_UI, "Cancel-Button geklickt")
-                                viewModel.closeEdit() 
+                                viewModel.deleteCard(card)
                             }
                         )
                     }
                 }
             }
         }
-        
+
         // QR-Code Dialog anzeigen, wenn eine Karte ausgewählt ist
         if (qrCodeCard != null) {
             Log.d(LogConfig.TAG_UI, "Zeige QR-Code-Dialog für Karte ${qrCodeCard?.id}")
             QrCodeDialog(
                 card = qrCodeCard!!,
-                onDismiss = { 
+                onDismiss = {
                     Log.d(LogConfig.TAG_UI, "QR-Code-Dialog geschlossen")
-                    viewModel.dismissQrCode() 
+                    viewModel.dismissQrCode()
                 }
             )
         }
-        
+
         // About-Dialog anzeigen, wenn auf den App-Titel geklickt wurde
         if (showAboutDialog) {
             Log.d(LogConfig.TAG_UI, "Zeige About-Dialog")
             AboutDialog(
-                onDismiss = { 
+                onDismiss = {
                     Log.d(LogConfig.TAG_UI, "About-Dialog geschlossen")
-                    showAboutDialog = false 
+                    showAboutDialog = false
                 }
             )
         }
@@ -209,17 +206,17 @@ fun EmptyState(onCreateClick: () -> Unit, modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center
         )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         Text(
             text = "Erstellen Sie Ihre erste digitale Visitenkarte, um einen QR-Code zu generieren.",
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         Button(onClick = onCreateClick) {
             Icon(
                 Icons.Default.Add,
@@ -248,12 +245,12 @@ fun MainScreenPreviewContent(
         editingCardId != null -> BusinessCardViewModel.CardEditState.Editing(editingCardId)
         else -> BusinessCardViewModel.CardEditState.Closed
     }
-    
+
     val cardsState = remember { mutableStateOf(cards) }
     val editModeState = remember { mutableStateOf(previewEditMode) }
     val selectedCardState = remember { mutableStateOf(selectedCard) }
     val qrCodeCardState = remember { mutableStateOf(qrCodeCard) }
-    
+
     // Mock des ViewModels für die Preview
     val previewViewModel = remember {
         object {
@@ -269,22 +266,22 @@ fun MainScreenPreviewContent(
             val qrCodeDialogCard = object {
                 fun collectAsState() = qrCodeCardState
             }
-            
+
             fun createNewCard() {
                 selectedCardState.value = BusinessCard()
                 editModeState.value = BusinessCardViewModel.CardEditState.Creating
             }
-            
+
             fun editCard(card: BusinessCard) {
                 selectedCardState.value = card
                 editModeState.value = BusinessCardViewModel.CardEditState.Editing(card.id)
             }
-            
+
             fun closeEdit() {
                 editModeState.value = BusinessCardViewModel.CardEditState.Closed
                 selectedCardState.value = null
             }
-            
+
             fun saveCard(card: BusinessCard) {
                 // Simuliere Kartenaktualisierung
                 val updatedCards = cardsState.value.toMutableList()
@@ -297,23 +294,23 @@ fun MainScreenPreviewContent(
                 cardsState.value = updatedCards
                 closeEdit()
             }
-            
+
             fun deleteCard(card: BusinessCard) {
                 val updatedCards = cardsState.value.filter { it.id != card.id }
                 cardsState.value = updatedCards
                 closeEdit()
             }
-            
+
             fun showQrCode(card: BusinessCard) {
                 qrCodeCardState.value = card
             }
-            
+
             fun dismissQrCode() {
                 qrCodeCardState.value = null
             }
         }
     }
-    
+
     // Nutze die UI-Komponente mit dem simulierten ViewModel
     MainScreen(viewModel = previewViewModel as BusinessCardViewModel)
 }
@@ -321,58 +318,8 @@ fun MainScreenPreviewContent(
 @Preview(showBackground = true, name = "Kartenliste")
 @Composable
 fun MainScreenPreview() {
-    // Sample-Daten für die Vorschau
-    val sampleCards = listOf(
-        BusinessCard(
-            id = 1,
-            name = "Max Mustermann",
-            position = "Software Developer",
-            company = "Muster GmbH",
-            phone = "+49 123 456789",
-            email = "max@example.com",
-            website = "www.example.com",
-            street = "Musterstraße 123",
-            postalCode = "12345",
-            city = "Musterstadt",
-            country = "Deutschland",
-            isPrivate = false
-        ),
-        BusinessCard(
-            id = 2,
-            name = "Erika Mustermann",
-            position = "Marketing Manager",
-            company = "Beispiel AG",
-            phone = "+49 987 654321",
-            email = "erika@example.com",
-            street = "Beispielweg 42",
-            postalCode = "54321",
-            city = "Beispielstadt",
-            country = "Deutschland",
-            isPrivate = false
-        ),
-        BusinessCard(
-            id = 3,
-            name = "John Doe",
-            position = "",
-            company = "",
-            phone = "+49 555 123456",
-            email = "john@example.com",
-            street = "Privatweg 7",
-            postalCode = "98765",
-            city = "Privatort",
-            country = "Deutschland",
-            isPrivate = true
-        )
-    )
-
     DigtalBusinessCardTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
-            // Diese Zeile wird vom Compiler nicht akzeptiert:
-            // MainScreenPreviewContent(cards = sampleCards)
-            // Der Code unter diesem Kommentar wird ebenfalls nicht funktionieren
-            // aber dient als Platzhalter für eine echte Preview-Implementierung
-            // Stattdessen würde man eine alternative Implementierung benötigen
-            
             // Warnhinweis für Preview-Zwecke
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(
