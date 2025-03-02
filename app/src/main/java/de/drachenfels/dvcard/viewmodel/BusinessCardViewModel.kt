@@ -96,6 +96,16 @@ class BusinessCardViewModel(
             }
         }
     }
+
+    /**
+     * Aktualisiere lokale LiveData/StateFlow der Karte
+     */
+    fun updateCard(card: BusinessCard) {
+        val updatedCards = _cards.value.map {
+            if (it.id == card.id) card else it
+        }
+        _cards.value = updatedCards
+    }
     
     /**
      * Deletes a card
