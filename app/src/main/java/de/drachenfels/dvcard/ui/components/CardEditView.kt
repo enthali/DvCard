@@ -5,16 +5,21 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import de.drachenfels.dvcard.R
 import de.drachenfels.dvcard.data.model.BusinessCard
 import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
-
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.Alignment
 /**
  * Composable für die Bearbeitung einer Visitenkarte
  *
  * @param card Die zu bearbeitende Visitenkarte
- * @param onSaveClick Callback wenn die Karte gespeichert wird (null = keine Speicherung)
  * @param onDeleteClick Callback wenn die Karte gelöscht wird (null = keine Löschfunktion)
  * @param onCancel Callback wenn die Bearbeitung abgebrochen wird (null = keine Abbruch-Funktion)
  */
@@ -26,7 +31,7 @@ fun CardEditView(
     onChange: (BusinessCard) -> Unit // Generischer Callback
 ) {
     // Hier müssen wir card als Key für remember verwenden, damit die Werte
-    // aktualisiert werden, wenn eine neue Karte angezeigt wird
+    // aktualisiert werden, wenn neu gerendert wird
     val title by remember(card) { mutableStateOf(card.title) }
     val name by remember(card) { mutableStateOf(card.name) }
     val position by remember(card) { mutableStateOf(card.position) }
@@ -46,12 +51,32 @@ fun CardEditView(
             .fillMaxWidth()
             .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
     ) {
-        // Kartentyp-Auswahl mit Segmented Control
-        Text(
-            text = "Kartentyp",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.card_type_label),
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            // Löschen-Icon nur anzeigen, wenn onDeleteClick nicht null ist
+            if (onDeleteClick != null) {
+                IconButton(
+                    onClick = onDeleteClick,
+                    content = {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.card_delete),
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                )
+            }
+        }
 
         // Segmented Control für Kartentyp
         Row(
@@ -71,7 +96,7 @@ fun CardEditView(
                 ),
                 border = if (!isPrivate) null else ButtonDefaults.outlinedButtonBorder(enabled = true)
             ) {
-                Text("Geschäftlich")
+                Text(stringResource(R.string.card_type_business))
                 onChange(card.copy(isPrivate = isPrivate))
             }
 
@@ -85,7 +110,7 @@ fun CardEditView(
                 ),
                 border = if (isPrivate) null else ButtonDefaults.outlinedButtonBorder(enabled = true)
             ) {
-                Text("Privat")
+                Text(stringResource(R.string.card_type_private))
                 onChange(card.copy(isPrivate = isPrivate))
             }
         }
@@ -93,9 +118,9 @@ fun CardEditView(
         // Eingabefelder
         OutlinedTextField(
             value = title,
-            onValueChange = {onChange(card.copy(title = it))},
-            label = { Text("Titel der Karte") },
-            placeholder = { Text("Optional - wird statt Name angezeigt, wenn gesetzt") },
+            onValueChange = { onChange(card.copy(title = it)) },
+            label = { Text(stringResource(R.string.title_label)) },
+            placeholder = { Text(stringResource(R.string.title_placeholder)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -105,7 +130,7 @@ fun CardEditView(
         OutlinedTextField(
             value = name,
             onValueChange = { onChange(card.copy(name = it)) },
-            label = { Text("Name") },
+            label = { Text(stringResource(R.string.name_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -115,7 +140,7 @@ fun CardEditView(
         OutlinedTextField(
             value = position,
             onValueChange = { onChange(card.copy(position = it)) },
-            label = { Text("Position") },
+            label = { Text(stringResource(R.string.position_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -125,7 +150,7 @@ fun CardEditView(
         OutlinedTextField(
             value = company,
             onValueChange = { onChange(card.copy(company = it))  },
-            label = { Text("Firma") },
+            label = { Text(stringResource(R.string.company_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -135,7 +160,7 @@ fun CardEditView(
         OutlinedTextField(
             value = phone,
             onValueChange = { onChange(card.copy(phone = it)) },
-            label = { Text("Telefon") },
+            label = { Text(stringResource(R.string.phone_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -145,7 +170,7 @@ fun CardEditView(
         OutlinedTextField(
             value = email,
             onValueChange = { onChange(card.copy(email = it))   },
-            label = { Text("E-Mail") },
+            label = { Text(stringResource(R.string.email_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -155,7 +180,7 @@ fun CardEditView(
         OutlinedTextField(
             value = website,
             onValueChange = { onChange(card.copy(website = it))   },
-            label = { Text("Webseite") },
+            label = { Text(stringResource(R.string.website_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -163,7 +188,7 @@ fun CardEditView(
         // Neue Adressfelder
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Adresse",
+            text = stringResource(R.string.address_section_label),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(vertical = 8.dp)
         )
@@ -171,7 +196,7 @@ fun CardEditView(
         OutlinedTextField(
             value = street,
             onValueChange = { onChange(card.copy(street = it))  },
-            label = { Text("Straße und Hausnummer") },
+            label = { Text(stringResource(R.string.street_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
@@ -185,7 +210,7 @@ fun CardEditView(
             OutlinedTextField(
                 value = postalCode,
                 onValueChange = { onChange(card.copy(postalCode = it)) },
-                label = { Text("PLZ") },
+                label = { Text(stringResource(R.string.postal_code_label)) },
                 modifier = Modifier.weight(0.4f),
                 singleLine = true
             )
@@ -193,7 +218,7 @@ fun CardEditView(
             OutlinedTextField(
                 value = city,
                 onValueChange = { onChange(card.copy(city = it)) },
-                label = { Text("Ort") },
+                label = { Text(stringResource(R.string.city_label)) },
                 modifier = Modifier.weight(0.6f),
                 singleLine = true
             )
@@ -204,28 +229,10 @@ fun CardEditView(
         OutlinedTextField(
             value = country,
             onValueChange = { onChange(card.copy(country = it)) },
-            label = { Text("Land") },
+            label = { Text(stringResource(R.string.country_label)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
         )
-
-        // Speichern-Button mit aktualisierter Funktion
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-                horizontalArrangement = Arrangement.Center
-        ) {
-            if (onDeleteClick != null) {
-                Button(
-                    onClick = onDeleteClick,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                    )) {
-                    Text("Löschen")
-                }
-            }
-        }
     }
 }
 
