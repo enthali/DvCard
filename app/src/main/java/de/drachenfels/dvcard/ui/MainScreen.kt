@@ -33,9 +33,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import de.drachenfels.dvcard.R
 import de.drachenfels.dvcard.ui.components.AboutDialog
 import de.drachenfels.dvcard.ui.components.CardItem
 import de.drachenfels.dvcard.ui.components.QrCodeDialog
@@ -69,7 +71,7 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Digitale Visitenkarte",
+                        text = stringResource(R.string.app_title),
                         modifier = Modifier.clickable {
                             Log.d(LogConfig.TAG_UI, "App-Titel geklickt - Zeige About-Dialog")
                             showAboutDialog = true
@@ -81,12 +83,15 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 Log.d(LogConfig.TAG_UI, "FAB geklickt - Neue Karte erstellen")
-                
+
                 scope.launch {
                     val id = viewModel.createNewCard()
                 }
             }) {
-                Icon(Icons.Filled.Add, contentDescription = "Neue Karte hinzufügen")
+                Icon(
+                    Icons.Filled.Add,
+                    contentDescription = stringResource(R.string.add_card)
+                )
             }
         }
     ) { paddingValues ->
@@ -175,7 +180,7 @@ fun EmptyState(onCreateClick: () -> Unit, modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Keine Visitenkarten vorhanden",
+            text = stringResource(R.string.empty_state_title),
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center
         )
@@ -183,7 +188,7 @@ fun EmptyState(onCreateClick: () -> Unit, modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Erstellen Sie Ihre erste digitale Visitenkarte, um einen QR-Code zu generieren.",
+            text = stringResource(R.string.empty_state_description),
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -197,7 +202,7 @@ fun EmptyState(onCreateClick: () -> Unit, modifier: Modifier = Modifier) {
                 modifier = Modifier.size(ButtonDefaults.IconSize)
             )
             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text("Visitenkarte erstellen")
+            Text(stringResource(R.string.create_card))
         }
     }
 }

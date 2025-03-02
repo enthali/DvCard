@@ -52,4 +52,11 @@
     <string name="qr_code_instruction">Scannen Sie diesen Code, um die Kontaktdaten zu importieren.</string>
     <string name="qr_code_tap_to_close">Tippen zum Schließen</string>
     <string name="dialog_close">Schließen</string>
+    
+    <!-- Main Screen -->
+    <string name="app_title">Digitale Visitenkarte</string>
+    <string name="add_card">Neue Karte hinzufügen</string>
+    <string name="empty_state_title">Keine Visitenkarten vorhanden</string>
+    <string name="empty_state_description">Erstellen Sie Ihre erste digitale Visitenkarte, um einen QR-Code zu generieren.</string>
+    <string name="create_card">Visitenkarte erstellen</string>
 </resources>
