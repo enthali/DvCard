@@ -59,4 +59,8 @@
     <string name="empty_state_title">No business cards available</string>
     <string name="empty_state_description">Create your first digital business card to generate a QR code.</string>
     <string name="create_card">Create business card</string>
+    
+    <!-- PlayStore QR Code -->
+    <string name="playstore_qr_title">App on Play Store</string>
+    <string name="playstore_qr_description">Scan this QR code to find the app on Google Play Store.</string>
 </resources>

@@ -59,4 +59,8 @@
     <string name="empty_state_title">Keine Visitenkarten vorhanden</string>
     <string name="empty_state_description">Erstellen Sie Ihre erste digitale Visitenkarte, um einen QR-Code zu generieren.</string>
     <string name="create_card">Visitenkarte erstellen</string>
+    
+    <!-- PlayStore QR Code -->
+    <string name="playstore_qr_title">App im Play Store</string>
+    <string name="playstore_qr_description">Scannen Sie diesen QR-Code, um die App im Google Play Store zu finden.</string>
 </resources>

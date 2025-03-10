@@ -84,3 +84,28 @@ fun generateVCardQrCode(card: BusinessCard, size: Int = 512): Bitmap {
     
     return bitmap
 }
+
+/**
+ * Generiert einen QR-Code für eine URL
+ */
+fun generateUrlQrCode(url: String, size: Int = 512): Bitmap {
+    Log.d(LogConfig.TAG_UTILS, "Generating URL QR code for: $url")
+    
+    val hints = hashMapOf<EncodeHintType, Any>().apply {
+        put(EncodeHintType.CHARACTER_SET, "UTF-8")
+        put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M)
+        put(EncodeHintType.MARGIN, 2)
+    }
+    
+    val qrCodeWriter = QRCodeWriter()
+    val bitMatrix = qrCodeWriter.encode(url, BarcodeFormat.QR_CODE, size, size, hints)
+    
+    val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+    for (x in 0 until size) {
+        for (y in 0 until size) {
+            bitmap.setPixel(x, y, if (bitMatrix[x, y]) Color.BLACK else Color.WHITE)
+        }
+    }
+    
+    return bitmap
+}
