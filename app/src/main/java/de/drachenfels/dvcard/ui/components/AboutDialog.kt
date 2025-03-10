@@ -20,8 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.drachenfels.dvcard.BuildConfig
@@ -136,6 +138,9 @@ private fun VersionInfo() {
  */
 @Composable
 private fun CopyrightInfo() {
+    val uriHandler = LocalUriHandler.current
+    val githubUrl = "https://github.com/drachenfels-de/dvcard"
+    
     Text(
         text = stringResource(R.string.about_copyright),
         style = MaterialTheme.typography.bodySmall,
@@ -146,6 +151,18 @@ private fun CopyrightInfo() {
         text = stringResource(R.string.about_rights),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+    
+    // GitHub repository link
+    Text(
+        text = stringResource(R.string.about_github),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.primary,
+        textDecoration = TextDecoration.Underline,
+        modifier = Modifier
+            .padding(top = 8.dp)
+            .fillMaxWidth(),
+        textAlign = TextAlign.Start
     )
 }
 

@@ -43,6 +43,7 @@
     <string name="about_description">This app allows you to manage digital business cards and generate QR codes in vCard format.</string>
     <string name="about_copyright">© 2025 Georg</string>
     <string name="about_rights">All rights reserved.</string>
+    <string name="about_github">Source code on GitHub: https://github.com/enthali/DvCard</string>
     <string name="about_message">Digital Business Card (DvCard) enables management of multiple digital business cards with QR code generation.</string>
     
     <!-- QR Code Dialog -->
