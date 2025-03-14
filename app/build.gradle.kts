@@ -13,8 +13,8 @@ android {
         applicationId = "de.drachenfels.dvcard"
         minSdk = 29
         targetSdk = 35
-        versionCode = 1
-        versionName = "that\'s what we call an MVP"
+        versionCode = 3
+        versionName = "instante update"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
