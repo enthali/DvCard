@@ -1,7 +1,6 @@
 package de.drachenfels.dvcard.data.model
 
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 /**
@@ -16,6 +15,7 @@ data class BusinessCard(
     var id: Long = 0,
     
     var title: String = "", // Neues Feld für den Titel der Karte
+    // TODO: seperate familiy name and given name otherwise ios devices will copy the full name into the family name field..
     var name: String = "",
     var position: String = "",
     var company: String = "",
