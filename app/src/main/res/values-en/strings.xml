@@ -12,8 +12,7 @@
     <string name="card_collapse">Collapse card</string>
     <string name="card_save">Save</string>
     <string name="card_delete">Delete</string>
-    <string name="card_add">New Card</string>
-    
+
     <!-- Contact information -->
     <string name="phone_prefix">Phone: %1$s</string>
     <string name="email_prefix">Email: %1$s</string>

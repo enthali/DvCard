@@ -12,8 +12,7 @@
     <string name="card_collapse">Karte einklappen</string>
     <string name="card_save">Speichern</string>
     <string name="card_delete">Löschen</string>
-    <string name="card_add">Neue Karte</string>
-    
+
     <!-- Contact information -->
     <string name="phone_prefix">Tel: %1$s</string>
     <string name="email_prefix">E-Mail: %1$s</string>

@@ -62,11 +62,8 @@ class BusinessCardViewModel(
         // Set flag to prevent duplicate card creation
         isCreatingNewCard = true
         
-        // Use string resource if context is available, otherwise default to "New Card"
-        val defaultName = context?.getString(R.string.card_add) ?: "New Card"
-        
-        viewModelScope.launch {
-            val newCard = BusinessCard(name = defaultName, isExpanded = true)
+                viewModelScope.launch {
+            val newCard = BusinessCard( isExpanded = true)
             try {
                 newId = repository.insertCard(newCard)
                 Log.d(LogConfig.TAG_VIEWMODEL, "New card successfully created with ID: $newId")
@@ -130,7 +127,6 @@ class BusinessCardViewModel(
                 if (isLastCard) {
                     Log.d(LogConfig.TAG_VIEWMODEL, "Last card was deleted, creating a new one")
                     val newCard = BusinessCard(
-                        name = context?.getString(R.string.card_add) ?: "New Card", 
                         isExpanded = true
                     )
                     repository.insertCard(newCard)
