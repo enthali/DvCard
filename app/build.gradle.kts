@@ -7,14 +7,14 @@ plugins {
 
 android {
     namespace = "de.drachenfels.dvcard"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "de.drachenfels.dvcard"
         minSdk = 29
-        targetSdk = 35
-        versionCode = 3
-        versionName = "instante update"
+        targetSdk = 36
+        versionCode = 4
+        versionName = "split the name"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
