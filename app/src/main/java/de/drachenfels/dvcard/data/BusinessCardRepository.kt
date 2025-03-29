@@ -35,26 +35,7 @@ class BusinessCardRepository(private val businessCardDao: BusinessCardDao) {
             throw e
         }
     }
-    
-    /**
-     * Holt eine spezifische Visitenkarte anhand ihrer ID.
-     */
-    suspend fun getCardById(id: Long): BusinessCard? {
-        Log.d(LogConfig.TAG_DATABASE, "Suche Karte mit ID: $id")
-        return try {
-            val card = businessCardDao.getCardById(id)
-            if (card != null) {
-                Log.d(LogConfig.TAG_DATABASE, "Karte gefunden: ${card.familyName}")
-            } else {
-                Log.d(LogConfig.TAG_DATABASE, "Keine Karte mit ID $id gefunden")
-            }
-            card
-        } catch (e: Exception) {
-            Log.e(LogConfig.TAG_DATABASE, "Fehler beim Suchen der Karte mit ID $id", e)
-            null
-        }
-    }
-    
+
     /**
      * Fügt eine neue Visitenkarte in die Datenbank ein und gibt die
      * generierte ID zurück.
