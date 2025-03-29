@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
     }
     private val viewModelFactory by lazy { 
         Log.d(LogConfig.TAG_MAIN, "Initializing ViewModelFactory")
-        BusinessCardViewModelFactory(repository, this) 
+        BusinessCardViewModelFactory(repository)
     }
     private val viewModel: BusinessCardViewModel by viewModels { 
         Log.d(LogConfig.TAG_MAIN, "Initializing ViewModel")
