@@ -15,7 +15,7 @@ interface BusinessCardDao {
      * Gibt alle gespeicherten Visitenkarten zurück, als Flow
      * für reaktive Updates in der UI.
      */
-    @Query("SELECT * FROM business_cards ORDER BY name ASC")
+    @Query("SELECT * FROM business_cards ORDER BY familyName ASC, givenName ASC")
     fun getAllCards(): Flow<List<BusinessCard>>
     
     /**

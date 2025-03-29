@@ -21,7 +21,8 @@
     <!-- Form labels -->
     <string name="title_label">Card Title</string>
     <string name="title_placeholder">Optional - displayed instead of name if set</string>
-    <string name="name_label">Name</string>
+    <string name="given_name_label">First Name</string>
+    <string name="family_name_label">Last Name</string>
     <string name="position_label">Position</string>
     <string name="company_label">Company</string>
     <string name="phone_label">Phone</string>

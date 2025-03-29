@@ -139,17 +139,17 @@ private fun CardContent(
 
 @Composable
 private fun CardTitleSection(card: BusinessCard) {
-    // Title or name, depending on what is set
-    val displayTitle = if (card.title.isNotEmpty()) card.title else card.name
+    // Title or full name, depending on what is set
+    val displayTitle = if (card.title.isNotEmpty()) card.title else card.getFullName()
     Text(
         text = displayTitle,
         style = MaterialTheme.typography.titleLarge
     )
 
-    // If a title is set, we also show the name
+    // If a title is set, we also show the full name
     if (card.title.isNotEmpty()) {
         Text(
-            text = card.name,
+            text = card.getFullName(),
             style = MaterialTheme.typography.titleMedium
         )
     }
@@ -309,7 +309,8 @@ fun CardItemPreview() {
 private val sampleCard = BusinessCard(
     id = 1,
     title = "Geschäftskarte",
-    name = "Max Mustermann",
+    givenName = "Max",
+    familyName = "Mustermann",
     position = "Software Developer",
     company = "Muster GmbH",
     phone = "+49 123 456789",
@@ -325,7 +326,8 @@ private val sampleCard = BusinessCard(
 private val privateCard = BusinessCard(
     id = 2,
     title = "Meine Privatkarte",
-    name = "Erika Mustermann",
+    givenName = "Erika",
+    familyName = "Mustermann",
     position = "",
     company = "",
     phone = "+49 987 654321",
@@ -341,7 +343,8 @@ private val privateCard = BusinessCard(
 private val minimalCard = BusinessCard(
     id = 3,
     title = "",
-    name = "John Doe",
+    givenName = "John",
+    familyName = "Doe",
     phone = "+49 555 123456",
     email = "john@example.com"
 )

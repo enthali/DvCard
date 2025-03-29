@@ -83,7 +83,7 @@ class BusinessCardViewModel(
      * Calls the repository to persist the data
      */
     fun saveCard(card: BusinessCard) {
-        Log.d(LogConfig.TAG_VIEWMODEL, "Saving card: ID=${card.id}, Name=${card.name}")
+        Log.d(LogConfig.TAG_VIEWMODEL, "Saving card: ID=${card.id}, Name=${card.familyName}")
         viewModelScope.launch {
             try {
                 repository.updateCard(card)
@@ -108,7 +108,7 @@ class BusinessCardViewModel(
      * Deletes a card
      */
     fun deleteCard(card: BusinessCard) {
-        Log.d(LogConfig.TAG_VIEWMODEL, "Deleting card: ID=${card.id}, Name=${card.name}")
+        Log.d(LogConfig.TAG_VIEWMODEL, "Deleting card: ID=${card.id}, Name=${card.familyName}")
         viewModelScope.launch {
             try {
                 // Check if this is the last card

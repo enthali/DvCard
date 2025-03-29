@@ -20,9 +20,9 @@ fun generateVCardString(card: BusinessCard): String {
     vCardBuilder.append("BEGIN:VCARD\n")
     vCardBuilder.append("VERSION:3.0\n")
     
-    // Name
-    vCardBuilder.append("N:${card.name};;;\n")
-    vCardBuilder.append("FN:${card.name}\n")
+    // Name im Format: Nachname;Vorname;Weitere Namen;Titel;Suffix
+    vCardBuilder.append("N:${card.familyName};${card.givenName};;;\n")
+    vCardBuilder.append("FN:${card.getFullName()}\n")
     
     // Beruf und Firma
     if (card.position.isNotEmpty() || card.company.isNotEmpty()) {

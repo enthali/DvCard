@@ -44,7 +44,7 @@ class BusinessCardRepository(private val businessCardDao: BusinessCardDao) {
         return try {
             val card = businessCardDao.getCardById(id)
             if (card != null) {
-                Log.d(LogConfig.TAG_DATABASE, "Karte gefunden: ${card.name}")
+                Log.d(LogConfig.TAG_DATABASE, "Karte gefunden: ${card.familyName}")
             } else {
                 Log.d(LogConfig.TAG_DATABASE, "Keine Karte mit ID $id gefunden")
             }
@@ -60,13 +60,13 @@ class BusinessCardRepository(private val businessCardDao: BusinessCardDao) {
      * generierte ID zurück.
      */
     suspend fun insertCard(card: BusinessCard): Long {
-        Log.d(LogConfig.TAG_DATABASE, "Füge neue Karte ein: ${card.name}")
+        Log.d(LogConfig.TAG_DATABASE, "Füge neue Karte ein: ${card.familyName}")
         return try {
             val id = businessCardDao.insertCard(card)
             Log.d(LogConfig.TAG_DATABASE, "Karte eingefügt mit ID: $id")
             id
         } catch (e: Exception) {
-            Log.e(LogConfig.TAG_DATABASE, "Fehler beim Einfügen der Karte: ${card.name}", e)
+            Log.e(LogConfig.TAG_DATABASE, "Fehler beim Einfügen der Karte: ${card.familyName}", e)
             throw e
         }
     }
@@ -75,7 +75,7 @@ class BusinessCardRepository(private val businessCardDao: BusinessCardDao) {
      * Aktualisiert eine bestehende Visitenkarte.
      */
     suspend fun updateCard(card: BusinessCard) {
-        Log.d(LogConfig.TAG_DATABASE, "Aktualisiere Karte: ID=${card.id}, Name=${card.name}")
+        Log.d(LogConfig.TAG_DATABASE, "Aktualisiere Karte: ID=${card.id}, Name=${card.familyName}")
         try {
             businessCardDao.updateCard(card)
             Log.d(LogConfig.TAG_DATABASE, "Karte erfolgreich aktualisiert")
@@ -89,7 +89,7 @@ class BusinessCardRepository(private val businessCardDao: BusinessCardDao) {
      * Löscht eine Visitenkarte aus der Datenbank.
      */
     suspend fun deleteCard(card: BusinessCard) {
-        Log.d(LogConfig.TAG_DATABASE, "Lösche Karte: ID=${card.id}, Name=${card.name}")
+        Log.d(LogConfig.TAG_DATABASE, "Lösche Karte: ID=${card.id}, Name=${card.familyName}")
         try {
             businessCardDao.deleteCard(card)
             Log.d(LogConfig.TAG_DATABASE, "Karte erfolgreich gelöscht")

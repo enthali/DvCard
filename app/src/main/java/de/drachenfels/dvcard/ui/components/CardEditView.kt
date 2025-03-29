@@ -33,7 +33,8 @@ fun CardEditView(
     // Hier müssen wir card als Key für remember verwenden, damit die Werte
     // aktualisiert werden, wenn neu gerendert wird
     val title by remember(card) { mutableStateOf(card.title) }
-    val name by remember(card) { mutableStateOf(card.name) }
+    val givenName by remember(card) { mutableStateOf(card.givenName) }
+    val familyName by remember(card) { mutableStateOf(card.familyName) }
     val position by remember(card) { mutableStateOf(card.position) }
     val company by remember(card) { mutableStateOf(card.company) }
     val phone by remember(card) { mutableStateOf(card.phone) }
@@ -127,13 +128,26 @@ fun CardEditView(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
-            value = name,
-            onValueChange = { onChange(card.copy(name = it)) },
-            label = { Text(stringResource(R.string.name_label)) },
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            OutlinedTextField(
+                value = givenName,
+                onValueChange = { onChange(card.copy(givenName = it)) },
+                label = { Text(stringResource(R.string.given_name_label)) },
+                modifier = Modifier.weight(1f),
+                singleLine = true
+            )
+            
+            OutlinedTextField(
+                value = familyName,
+                onValueChange = { onChange(card.copy(familyName = it)) },
+                label = { Text(stringResource(R.string.family_name_label)) },
+                modifier = Modifier.weight(1f),
+                singleLine = true
+            )
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -240,7 +254,8 @@ fun CardEditView(
 private val sampleCard = BusinessCard(
     id = 1,
     title = "Geschäftskarte",
-    name = "Max Mustermann",
+    givenName = "Max",
+    familyName = "Mustermann",
     position = "Software Developer",
     company = "Muster GmbH",
     phone = "+49 123 456789",

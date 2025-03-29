@@ -35,11 +35,62 @@ private val MIGRATION_2_3 = object : Migration(2, 3) {
 }
 
 /**
+ * Migration von Version 3 zu Version 4
+ *
+ * Benennt das 'name'-Feld zu 'familyName' um und fügt das neue 'givenName'-Feld hinzu
+ */
+private val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // Schritt 1: Temporäre Tabelle erstellen mit der neuen Struktur
+        db.execSQL("""
+            CREATE TABLE business_cards_temp (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                title TEXT NOT NULL DEFAULT '',
+                familyName TEXT NOT NULL DEFAULT '',
+                givenName TEXT NOT NULL DEFAULT '',
+                position TEXT NOT NULL DEFAULT '',
+                company TEXT NOT NULL DEFAULT '',
+                phone TEXT NOT NULL DEFAULT '',
+                email TEXT NOT NULL DEFAULT '',
+                website TEXT NOT NULL DEFAULT '',
+                street TEXT NOT NULL DEFAULT '',
+                postalCode TEXT NOT NULL DEFAULT '',
+                city TEXT NOT NULL DEFAULT '',
+                country TEXT NOT NULL DEFAULT '',
+                isPrivate INTEGER NOT NULL DEFAULT 0,
+                isExpanded INTEGER NOT NULL DEFAULT 0
+            )
+        """)
+        
+        // Schritt 2: Daten von der alten Tabelle in die neue Tabelle kopieren,
+        // wobei 'name' in 'familyName' umbenannt wird
+        db.execSQL("""
+            INSERT INTO business_cards_temp (
+                id, title, familyName, position, company, 
+                phone, email, website, street, postalCode, 
+                city, country, isPrivate, isExpanded
+            ) 
+            SELECT 
+                id, title, name, position, company, 
+                phone, email, website, street, postalCode, 
+                city, country, isPrivate, isExpanded 
+            FROM business_cards
+        """)
+        
+        // Schritt 3: Alte Tabelle löschen
+        db.execSQL("DROP TABLE business_cards")
+        
+        // Schritt 4: Neue Tabelle umbenennen
+        db.execSQL("ALTER TABLE business_cards_temp RENAME TO business_cards")
+    }
+}
+
+/**
  * Room-Datenbank für die App
  *
  * Zentrale Datenbank, die alle Visitenkarten speichert.
  */
-@Database(entities = [BusinessCard::class], version = 3, exportSchema = false)
+@Database(entities = [BusinessCard::class], version = 4, exportSchema = false)
 abstract class BusinessCardDatabase : RoomDatabase() {
     /**
      * Liefert das DAO für den Zugriff auf die Visitenkarten.
@@ -79,6 +130,7 @@ abstract class BusinessCardDatabase : RoomDatabase() {
                     // Migration hinzufügen, um bestehende Daten zu erhalten
                     .addMigrations(MIGRATION_1_2)
                     .addMigrations(MIGRATION_2_3)
+                    .addMigrations(MIGRATION_3_4)
                     // Fallback nur als letzte Option
                     .fallbackToDestructiveMigration()
                     .setJournalMode(JournalMode.TRUNCATE) // Sofortiges Committen nach Transaktionen

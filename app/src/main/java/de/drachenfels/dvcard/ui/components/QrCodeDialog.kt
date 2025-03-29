@@ -28,8 +28,8 @@ import de.drachenfels.dvcard.util.generateVCardQrCode
  */
 @Composable
 fun QrCodeDialog(card: BusinessCard, onDismiss: () -> Unit) {
-    // Determine display title (use title if available, otherwise use name)
-    val displayTitle = if (card.title.isNotEmpty()) card.title else card.name
+    // Determine display title (use title if available, otherwise use full name)
+    val displayTitle = if (card.title.isNotEmpty()) card.title else card.getFullName()
     
     Dialog(onDismissRequest = onDismiss) {
         QrCodeDialogContent(
@@ -156,7 +156,8 @@ private fun DialogFooter() {
 private val sampleCard = BusinessCard(
     id = 1,
     title = "Geschäftskarte",
-    name = "Max Mustermann",
+    givenName = "Max",
+    familyName = "Mustermann",
     position = "Software Developer",
     company = "Muster GmbH",
     phone = "+49 123 456789",
@@ -172,7 +173,8 @@ private val sampleCard = BusinessCard(
 private val sampleCardNoTitle = BusinessCard(
     id = 2,
     title = "",
-    name = "Max Mustermann",
+    givenName = "Max",
+    familyName = "Mustermann",
     position = "Software Developer",
     company = "Muster GmbH",
     phone = "+49 123 456789",
@@ -187,7 +189,7 @@ fun QrCodeDialogPreview() {
             // Since the dialog is displayed as an overlay and we can't have a dialog in a preview,
             // we display the content of the dialog directly
             QrCodeDialogContent(
-                displayTitle = if (sampleCard.title.isNotEmpty()) sampleCard.title else sampleCard.name,
+                displayTitle = if (sampleCard.title.isNotEmpty()) sampleCard.title else sampleCard.getFullName(),
                 card = sampleCard,
                 onDismiss = {}
             )
@@ -201,7 +203,7 @@ fun QrCodeDialogNoTitlePreview() {
     DigtalBusinessCardTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             QrCodeDialogContent(
-                displayTitle = sampleCardNoTitle.name,
+                displayTitle = sampleCardNoTitle.getFullName(),
                 card = sampleCardNoTitle,
                 onDismiss = {}
             )

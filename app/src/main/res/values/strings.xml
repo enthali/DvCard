@@ -21,7 +21,8 @@
     <!-- Form labels -->
     <string name="title_label">Titel der Karte</string>
     <string name="title_placeholder">Optional - wird statt Name angezeigt, wenn gesetzt</string>
-    <string name="name_label">Name</string>
+    <string name="given_name_label">Vorname</string>
+    <string name="family_name_label">Nachname</string>
     <string name="position_label">Position</string>
     <string name="company_label">Firma</string>
     <string name="phone_label">Telefon</string>
