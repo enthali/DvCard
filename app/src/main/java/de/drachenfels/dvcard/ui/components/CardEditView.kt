@@ -21,7 +21,7 @@ import androidx.compose.ui.Alignment
  *
  * @param card Die zu bearbeitende Visitenkarte
  * @param onDeleteClick Callback wenn die Karte gelöscht wird (null = keine Löschfunktion)
- * @param onCancel Callback wenn die Bearbeitung abgebrochen wird (null = keine Abbruch-Funktion)
+ * @param onChange Callback wenn das Element bearbeitet wird (null = keine Änderungs-Funktion)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

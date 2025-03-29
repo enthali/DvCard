@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import de.drachenfels.dvcard.R
 import de.drachenfels.dvcard.data.BusinessCardRepository
 import de.drachenfels.dvcard.data.model.BusinessCard
 import de.drachenfels.dvcard.util.logger.Log
@@ -18,8 +17,8 @@ import kotlinx.coroutines.launch
  * ViewModel for managing business cards and UI states
  */
 class BusinessCardViewModel(
-    private val repository: BusinessCardRepository,
-    private val context: Context? = null
+    private val repository: BusinessCardRepository
+    // private val context: Context? = null
 ) : ViewModel() {
     
     // List of all business cards
@@ -162,13 +161,12 @@ class BusinessCardViewModel(
  * Factory for creating the ViewModel with repository dependency
  */
 class BusinessCardViewModelFactory(
-    private val repository: BusinessCardRepository,
-    private val context: Context? = null
+    private val repository: BusinessCardRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(BusinessCardViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return BusinessCardViewModel(repository, context) as T
+            return BusinessCardViewModel(repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
