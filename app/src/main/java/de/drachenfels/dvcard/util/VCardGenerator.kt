@@ -9,6 +9,8 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import de.drachenfels.dvcard.data.model.BusinessCard
 import de.drachenfels.dvcard.util.logger.Log
 import de.drachenfels.dvcard.util.logger.LogConfig
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.set
 
 /**
  * Generiert einen vCard-String im Format 3.0 aus einer BusinessCard
@@ -75,10 +77,10 @@ fun generateVCardQrCode(card: BusinessCard, size: Int = 512): Bitmap {
     val qrCodeWriter = QRCodeWriter()
     val bitMatrix = qrCodeWriter.encode(vCardContent, BarcodeFormat.QR_CODE, size, size, hints)
     
-    val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+    val bitmap = createBitmap(size, size)
     for (x in 0 until size) {
         for (y in 0 until size) {
-            bitmap.setPixel(x, y, if (bitMatrix[x, y]) Color.BLACK else Color.WHITE)
+            bitmap[x, y] = if (bitMatrix[x, y]) Color.BLACK else Color.WHITE
         }
     }
     
@@ -100,10 +102,10 @@ fun generateUrlQrCode(url: String, size: Int = 512): Bitmap {
     val qrCodeWriter = QRCodeWriter()
     val bitMatrix = qrCodeWriter.encode(url, BarcodeFormat.QR_CODE, size, size, hints)
     
-    val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+    val bitmap = createBitmap(size, size)
     for (x in 0 until size) {
         for (y in 0 until size) {
-            bitmap.setPixel(x, y, if (bitMatrix[x, y]) Color.BLACK else Color.WHITE)
+            bitmap[x, y] = if (bitMatrix[x, y]) Color.BLACK else Color.WHITE
         }
     }
     
