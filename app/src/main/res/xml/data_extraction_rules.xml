@@ -9,19 +9,12 @@
         <!-- Include only the business card database -->
         <include domain="database" path="business_card_database" />
         
-        <!-- Exclude everything else to optimize backup size -->
-        <exclude domain="root" path="." />
-        <exclude domain="file" path="." />
-        <exclude domain="external" path="." />
-        <exclude domain="sharedpref" path="." />
+        <!-- We don't need to explicitly exclude other paths since Android will 
+             only include what's explicitly listed above -->
     </cloud-backup>
     
     <device-transfer>
         <!-- Same rules for device-to-device transfers -->
         <include domain="database" path="business_card_database" />
-        <exclude domain="root" path="." />
-        <exclude domain="file" path="." />
-        <exclude domain="external" path="." />
-        <exclude domain="sharedpref" path="." />
     </device-transfer>
 </data-extraction-rules>
