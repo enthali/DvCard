@@ -17,7 +17,7 @@ DvCard is an Android app for managing digital business cards with QR code genera
 
 This website is automatically deployed to GitHub Pages when changes are pushed to the `gh-pages` branch.
 
-Website URL: https://[your-username].github.io/DvCard/
+Website URL: https://enthali.github.io/DvCard/
 
 ## Local Development
 
