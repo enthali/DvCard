@@ -2,8 +2,10 @@ package de.drachenfels.dvcard.data
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.core.os.LocaleListCompat
-import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.util.Locale
 
 /**
@@ -16,6 +18,9 @@ class LanguagePreferences(context: Context) {
         Context.MODE_PRIVATE
     )
     
+    private val _currentLanguage = MutableStateFlow(getCurrentLanguageFromPrefs())
+    val currentLanguage: StateFlow<String> = _currentLanguage.asStateFlow()
+    
     companion object {
         private const val KEY_LANGUAGE_CODE = "language_code"
         const val LANGUAGE_GERMAN = "de"
@@ -26,39 +31,28 @@ class LanguagePreferences(context: Context) {
     }
     
     /**
-     * Get current language code
+     * Get current language code from preferences
      */
-    fun getCurrentLanguage(): String {
+    private fun getCurrentLanguageFromPrefs(): String {
         return prefs.getString(KEY_LANGUAGE_CODE, DEFAULT_LANGUAGE) ?: DEFAULT_LANGUAGE
     }
     
     /**
-     * Set current language and apply it to the app
+     * Get current language code
+     */
+    fun getCurrentLanguage(): String {
+        return _currentLanguage.value
+    }
+    
+    /**
+     * Set current language
      */
     fun setLanguage(languageCode: String) {
         prefs.edit()
             .putString(KEY_LANGUAGE_CODE, languageCode)
             .apply()
         
-        // Apply language change immediately
-        applyLanguage(languageCode)
-    }
-    
-    /**
-     * Apply language change to the app
-     */
-    private fun applyLanguage(languageCode: String) {
-        val locale = Locale(languageCode)
-        val localeList = LocaleListCompat.create(locale)
-        AppCompatDelegate.setApplicationLocales(localeList)
-    }
-    
-    /**
-     * Initialize language on app start
-     */
-    fun initializeLanguage() {
-        val currentLanguage = getCurrentLanguage()
-        applyLanguage(currentLanguage)
+        _currentLanguage.value = languageCode
     }
     
     /**
@@ -83,5 +77,12 @@ class LanguagePreferences(context: Context) {
             LANGUAGE_ENGLISH -> "DE" // Show "DE" when English is active (to switch to German)
             else -> "EN"
         }
+    }
+    
+    /**
+     * Get locale for current language
+     */
+    fun getCurrentLocale(): Locale {
+        return Locale(getCurrentLanguage())
     }
 }

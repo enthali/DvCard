@@ -13,7 +13,6 @@ zxing = "3.5.1"
 material-icons = "1.7.8"
 kotlinx-coroutines = "1.7.3"
 symbolProcessing = "2.1.10-1.0.30"
-appcompat = "1.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,9 +44,6 @@ androidx-material-icons-extended = { group = "androidx.compose.material", name =
 # Coroutines
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
 symbol-processing = { group = "com.google.devtools.ksp", name = "symbol-processing", version = "2.1.10-1.0.30" }
-
-# AppCompat for locale management
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

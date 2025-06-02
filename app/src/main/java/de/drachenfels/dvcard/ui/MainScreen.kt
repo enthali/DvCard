@@ -49,7 +49,6 @@ import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
 import de.drachenfels.dvcard.util.logger.Log
 import de.drachenfels.dvcard.util.logger.LogConfig
 import de.drachenfels.dvcard.viewmodel.BusinessCardViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -72,7 +71,6 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
     
     // Language preferences
     val languagePrefs = remember { LanguagePreferences(context) }
-    val currentLanguageFlow = remember { MutableStateFlow(languagePrefs.getCurrentLanguage()) }
 
     Log.d(LogConfig.TAG_UI, "MainScreen State: cards=${cards.size}")
 
@@ -93,9 +91,8 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                         onLanguageToggle = {
                             Log.d(LogConfig.TAG_UI, "Language toggle clicked")
                             languagePrefs.toggleLanguage()
-                            currentLanguageFlow.value = languagePrefs.getCurrentLanguage()
                         },
-                        currentLanguageFlow = currentLanguageFlow
+                        currentLanguageFlow = languagePrefs.currentLanguage
                     )
                 }
             )

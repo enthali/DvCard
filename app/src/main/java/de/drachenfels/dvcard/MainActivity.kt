@@ -14,6 +14,7 @@ import de.drachenfels.dvcard.data.BusinessCardDatabase
 import de.drachenfels.dvcard.data.BusinessCardRepository
 import de.drachenfels.dvcard.data.LanguagePreferences
 import de.drachenfels.dvcard.ui.MainScreen
+import de.drachenfels.dvcard.ui.components.LocaleProvider
 import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
 import de.drachenfels.dvcard.util.logger.Log
 import de.drachenfels.dvcard.util.logger.LogConfig
@@ -56,9 +57,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         Log.d(LogConfig.TAG_MAIN, "MainActivity.onCreate called")
         
-        // Initialize language preferences first
-        languagePrefs.initializeLanguage()
-        
         enableEdgeToEdge()
         
         // Check if the database exists and is accessible
@@ -67,11 +65,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             Log.d(LogConfig.TAG_MAIN, "Setting up Compose content")
             DigtalBusinessCardTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    MainScreen(viewModel = viewModel)
+                LocaleProvider(languagePreferences = languagePrefs) {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        MainScreen(viewModel = viewModel)
+                    }
                 }
             }
         }
