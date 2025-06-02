@@ -19,8 +19,10 @@ DvCard (Digital vCard) is an Android app for managing multiple digital business 
 ![Screenshot 2](docs/Screenshot_20250226_223856.png)
 ![Screenshot 3](docs/Screenshot_20250226_223927.png)
 
-## Website URL: https://enthali.github.io/DvCard/
-https://dvcard.drachen-fels.de/
+## Website URL:
+
+- https://enthali.github.io/DvCard/
+- https://dvcard.drachen-fels.de/
 
 ## Technical Details
 ### Technology Stack
