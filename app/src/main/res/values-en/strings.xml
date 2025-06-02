@@ -64,4 +64,7 @@
     <!-- PlayStore QR Code -->
     <string name="playstore_qr_title">App on Play Store</string>
     <string name="playstore_qr_description">Scan this QR code to find the app on Google Play Store.</string>
+    
+    <!-- Language switching -->
+    <string name="language_switch_description">Switch language</string>
 </resources>

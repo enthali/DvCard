@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -33,18 +34,22 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.drachenfels.dvcard.R
+import de.drachenfels.dvcard.data.LanguagePreferences
 import de.drachenfels.dvcard.ui.components.AboutDialog
 import de.drachenfels.dvcard.ui.components.CardItem
+import de.drachenfels.dvcard.ui.components.LanguageSwitcher
 import de.drachenfels.dvcard.ui.components.QrCodeDialog
 import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
 import de.drachenfels.dvcard.util.logger.Log
 import de.drachenfels.dvcard.util.logger.LogConfig
 import de.drachenfels.dvcard.viewmodel.BusinessCardViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 /**
@@ -60,9 +65,14 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
     val cards by viewModel.cards.collectAsState()
     val qrCodeCard by viewModel.qrCodeDialogCard.collectAsState()
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     // State für den About-Dialog
     var showAboutDialog by remember { mutableStateOf(false) }
+    
+    // Language preferences
+    val languagePrefs = remember { LanguagePreferences(context) }
+    val currentLanguageFlow = remember { MutableStateFlow(languagePrefs.getCurrentLanguage()) }
 
     Log.d(LogConfig.TAG_UI, "MainScreen State: cards=${cards.size}")
 
@@ -76,6 +86,16 @@ fun MainScreen(viewModel: BusinessCardViewModel) {
                             Log.d(LogConfig.TAG_UI, "App-Titel geklickt - Zeige About-Dialog")
                             showAboutDialog = true
                         }
+                    )
+                },
+                actions = {
+                    LanguageSwitcher(
+                        onLanguageToggle = {
+                            Log.d(LogConfig.TAG_UI, "Language toggle clicked")
+                            languagePrefs.toggleLanguage()
+                            currentLanguageFlow.value = languagePrefs.getCurrentLanguage()
+                        },
+                        currentLanguageFlow = currentLanguageFlow
                     )
                 }
             )

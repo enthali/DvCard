@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Digtal Business Card</string>
+    <string name="app_name">Digitale Visitenkarte</string>
     
     <!-- Card types -->
     <string name="card_type_private">Privat</string>

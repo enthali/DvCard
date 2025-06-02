@@ -70,6 +70,9 @@ dependencies {
     implementation(libs.symbol.processing)
     implementation(libs.androidx.room.compiler)
 
+    // AppCompat for locale management
+    implementation(libs.androidx.appcompat)
+
     // Test Dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

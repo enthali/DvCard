@@ -12,6 +12,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import de.drachenfels.dvcard.data.BusinessCardDatabase
 import de.drachenfels.dvcard.data.BusinessCardRepository
+import de.drachenfels.dvcard.data.LanguagePreferences
 import de.drachenfels.dvcard.ui.MainScreen
 import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
 import de.drachenfels.dvcard.util.logger.Log
@@ -45,9 +46,18 @@ class MainActivity : ComponentActivity() {
         viewModelFactory 
     }
     
+    // Language preferences
+    private val languagePrefs by lazy {
+        Log.d(LogConfig.TAG_MAIN, "Initializing LanguagePreferences")
+        LanguagePreferences(this)
+    }
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(LogConfig.TAG_MAIN, "MainActivity.onCreate called")
+        
+        // Initialize language preferences first
+        languagePrefs.initializeLanguage()
         
         enableEdgeToEdge()
         
