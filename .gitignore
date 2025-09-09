@@ -13,3 +13,9 @@ local.properties
 /app/release/app-release.aab
 
 /TODO.md
+
+# Keystore-Sicherheit
+dvcard-keys/keystore.properties
+*.jks
+*.keystore
+/dvcard-keys/

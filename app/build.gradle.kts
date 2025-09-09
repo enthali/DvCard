@@ -13,8 +13,8 @@ android {
         applicationId = "de.drachenfels.dvcard"
         minSdk = 29
         targetSdk = 36
-        versionCode = 4
-        versionName = "split the name"
+        versionCode = 5
+        versionName = "there\'s light"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
