@@ -1,0 +1,44 @@
+# Git Attributes für Cross-Platform Development (Windows/Linux)
+# Verhindert CRLF/LF Probleme zwischen Windows Host und Linux Container
+
+# Standard: LF für alle Textdateien
+* text=auto eol=lf
+
+# Source Code Dateien - immer LF
+*.kt text eol=lf
+*.java text eol=lf
+*.xml text eol=lf
+*.json text eol=lf
+*.gradle text eol=lf
+*.kts text eol=lf
+*.toml text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.properties text eol=lf
+
+# Shell Scripts - immer LF (wichtig für Linux Container)
+*.sh text eol=lf
+
+# Windows Batch Files - immer CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# PowerShell - immer CRLF
+*.ps1 text eol=crlf
+
+# Binary Dateien - nicht ändern
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.jar binary
+*.zip binary
+*.aar binary
+*.so binary
+*.dll binary
+*.exe binary
+
+# Gradle Wrapper - binär behandeln
+gradle-wrapper.jar binary

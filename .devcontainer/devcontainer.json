@@ -1,0 +1,52 @@
+{
+  "name": "Android Development (Simplified)",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {},
+  "forwardPorts": [5037, 8080],
+  "mounts": [
+    // Mount für Android SDK Cache (Performance)
+    "source=android-sdk-cache,target=/android-sdk,type=volume",
+    // Mount für Gradle Cache (Performance)  
+    "source=gradle-cache,target=/root/.gradle,type=volume",
+    // KVM Device für Android Emulator Hardware Acceleration
+    "source=/dev/kvm,target=/dev/kvm,type=bind"
+  ],
+  "runArgs": [
+    "--privileged",
+    "--device=/dev/kvm:/dev/kvm"
+  ],
+  "containerEnv": {
+    "DISPLAY": "host.docker.internal:0.0",
+    "LANG": "en_US.UTF-8",
+    "LANGUAGE": "en_US:en",
+    "LC_ALL": "en_US.UTF-8",
+    "LIBGL_ALWAYS_INDIRECT": "1",
+    "XDG_RUNTIME_DIR": "/tmp",
+    "ANDROID_HOME": "/android-sdk",
+    "ANDROID_SDK_ROOT": "/android-sdk"
+  },
+  "postCreateCommand": ".devcontainer/post-create.sh",
+  "remoteUser": "root",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "mathiasfrohlich.Kotlin",
+        "ms-vscode.vscode-json"
+      ],
+      "settings": {
+        "java.configuration.runtimes": [
+          {
+            "name": "JavaSE-21",
+            "path": "/usr/lib/jvm/java-21-openjdk-amd64/"
+          }
+        ],
+        "java.compile.nullAnalysis.mode": "automatic",
+        "files.defaultLanguage": "en",
+        "locale": "en"
+      }
+    }
+  }
+}
