@@ -60,7 +60,7 @@ class BusinessCardViewModel(
         // Set flag to prevent duplicate card creation
         isCreatingNewCard = true
         
-                viewModelScope.launch {
+        viewModelScope.launch {
             val newCard = BusinessCard( isExpanded = true)
             try {
                 newId = repository.insertCard(newCard)
