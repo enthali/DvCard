@@ -1,13 +1,19 @@
 package de.drachenfels.dvcard.ui.components
 
+import android.animation.ValueAnimator
+import android.app.Activity
+import android.provider.Settings
+import android.view.WindowManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -19,6 +25,7 @@ import de.drachenfels.dvcard.data.model.BusinessCard
 import de.drachenfels.dvcard.ui.theme.DigtalBusinessCardTheme
 import de.drachenfels.dvcard.util.createMockQrBitmap
 import de.drachenfels.dvcard.util.generateVCardQrCode
+import kotlin.math.min
 
 /**
  * Dialog to display a QR code for a business card
@@ -30,6 +37,61 @@ import de.drachenfels.dvcard.util.generateVCardQrCode
 fun QrCodeDialog(card: BusinessCard, onDismiss: () -> Unit) {
     // Determine display title (use title if available, otherwise use full name)
     val displayTitle = if (card.title.isNotEmpty()) card.title else card.getFullName()
+    
+    // Implementierung der automatischen Helligkeitsanpassung
+    val context = LocalContext.current
+    val activity = context as? Activity
+
+    // DisposableEffect für Helligkeitsanpassung
+    DisposableEffect(Unit) {
+        val window = activity?.window
+        val originalBrightness = window?.attributes?.screenBrightness ?: WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+        
+        // Aktuelle Helligkeit bestimmen
+        val actualBrightness = if (originalBrightness == WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE) {
+            try {
+                val systemBrightness = Settings.System.getInt(
+                    context.contentResolver,
+                    Settings.System.SCREEN_BRIGHTNESS
+                )
+                systemBrightness / 255f // 0-255 to 0-1 scale
+            } catch (_: Exception) {
+                0.5f // Default fallback
+            }
+        } else {
+            originalBrightness
+        }
+        
+        // Helligkeit um 50% erhöhen (maximal 1.0)
+        val targetBrightness = min(actualBrightness * 1.5f, 1.0f)
+        
+        // Animation der Helligkeit
+        val valueAnimator = ValueAnimator.ofFloat(actualBrightness, targetBrightness)
+        valueAnimator.addUpdateListener { animator ->
+            val value = animator.animatedValue as Float
+            window?.attributes = window.attributes?.apply {
+                screenBrightness = value
+            }
+        }
+        valueAnimator.duration = 300
+        valueAnimator.start()
+        
+        onDispose {
+            // Animation zum Originalwert zurück
+            val restoreAnimator = ValueAnimator.ofFloat(
+                window?.attributes?.screenBrightness ?: targetBrightness, 
+                originalBrightness
+            )
+            restoreAnimator.addUpdateListener { animator ->
+                val value = animator.animatedValue as Float
+                window?.attributes = window.attributes?.apply {
+                    screenBrightness = value
+                }
+            }
+            restoreAnimator.duration = 300
+            restoreAnimator.start()
+        }
+    }
     
     Dialog(onDismissRequest = onDismiss) {
         QrCodeDialogContent(
