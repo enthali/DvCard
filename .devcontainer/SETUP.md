@@ -23,19 +23,15 @@ cd C:\path\to\DvCard
 
 ✅ **Installs automatically:**
 - Docker Desktop
-- VcXsrv X11 Server  
 - Visual Studio Code
 - Git (if needed)
 - Required VS Code extensions
 
 ✅ **Configures automatically:**
-- VcXsrv autostart (scheduled task)
 - VS Code Dev Container extension
 - Docker WSL2 backend check
 
-✅ **Creates startup script:**
-- `C:\Scripts\start-vcxsrv.bat`
-- Scheduled task: "Android Dev - VcXsrv Autostart"
+
 
 ## Usage after setup
 

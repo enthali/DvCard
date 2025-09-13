@@ -92,17 +92,7 @@ function Install-Prerequisites {
     }
 
     # Install VcXsrv
-    if (-not (Test-Path "C:\Program Files\VcXsrv\vcxsrv.exe")) {
-        Write-Step "Installing VcXsrv X11 Server..."
-        try {
-            winget install --id marha.VcXsrv --accept-package-agreements --accept-source-agreements
-            Write-Success "VcXsrv installed"
-        } catch {
-            Write-Warning "Failed to install VcXsrv via winget. Please install manually."
-        }
-    } else {
-        Write-Success "VcXsrv already installed"
-    }
+
 
     # Install VS Code
     if (-not (Test-SoftwareInstalled -Command "code")) {
@@ -152,82 +142,7 @@ function Install-VSCodeExtensions {
 }
 
 function Setup-VcXsrvAutostart {
-    Write-Step "Setting up VcXsrv autostart..."
-    
-    # Create Scripts directory
-    $scriptsDir = "C:\Scripts"
-    if (-not (Test-Path $scriptsDir)) {
-        New-Item -Path $scriptsDir -ItemType Directory -Force | Out-Null
-        Write-Success "Created $scriptsDir directory"
-    }
-    
-    # Create VcXsrv startup script
-    $startupScript = @'
-@echo off
-REM Android Development Container - VcXsrv X11 Server Autostart
-REM This script starts VcXsrv with optimal settings for GUI forwarding
 
-echo Starting VcXsrv X11 Server for Android Development...
-"C:\Program Files\VcXsrv\vcxsrv.exe" :0 -ac -terminate -lesspointer -multiwindow -clipboard -wgl -dpi auto
-
-REM Parameters explained:
-REM :0 - Display number 0
-REM -ac - Disable access control (allows container connections)
-REM -terminate - Terminate when last client disconnects
-REM -lesspointer - Don't show mouse pointer when not over window  
-REM -multiwindow - Each X window in separate Windows window
-REM -clipboard - Enable clipboard sharing
-REM -wgl - Use Windows OpenGL
-REM -dpi auto - Automatic DPI detection
-'@
-    
-    $batchFile = Join-Path $scriptsDir "start-vcxsrv.bat"
-    Set-Content -Path $batchFile -Value $startupScript -Encoding ASCII
-    Write-Success "Created VcXsrv startup script: $batchFile"
-    
-    # Add to Task Scheduler for reliable autostart
-    $taskName = "Android Dev - VcXsrv Autostart"
-    
-    # Remove existing task if present
-    try {
-        schtasks /delete /tn $taskName /f 2>$null
-    } catch {
-        # Task doesn't exist, ignore
-    }
-    
-    # Create new scheduled task
-    try {
-        schtasks /create /tn $taskName /tr $batchFile /sc onlogon /delay 0000:15 /rl highest /f
-        Write-Success "VcXsrv autostart task created successfully"
-        
-        # Test the task
-        Write-Step "Testing VcXsrv autostart task..."
-        schtasks /run /tn $taskName
-        Start-Sleep -Seconds 3
-        
-        $vcxsrvProcess = Get-Process -Name "vcxsrv" -ErrorAction SilentlyContinue
-        if ($vcxsrvProcess) {
-            Write-Success "VcXsrv started successfully via scheduled task"
-        } else {
-            Write-Warning "VcXsrv task created but failed to start. You may need to start it manually."
-        }
-        
-    } catch {
-        Write-Warning "Failed to create scheduled task. Trying startup folder method..."
-        
-        # Fallback: Add to startup folder
-        $startupFolder = [Environment]::GetFolderPath("Startup")
-        $shortcut = Join-Path $startupFolder "VcXsrv-AndroidDev.lnk"
-        
-        # Create shortcut
-        $shell = New-Object -ComObject WScript.Shell
-        $shortcutObj = $shell.CreateShortcut($shortcut)
-        $shortcutObj.TargetPath = $batchFile
-        $shortcutObj.Description = "VcXsrv X11 Server for Android Development"
-        $shortcutObj.Save()
-        
-        Write-Success "VcXsrv shortcut added to startup folder: $shortcut"
-    }
 }
 
 function Setup-WSLKvmSupport {
@@ -343,17 +258,11 @@ function Show-PostInstallInstructions {
     
     Write-Host "`n" -NoNewline
     Write-Host "📋 Troubleshooting:" -ForegroundColor $Cyan
-    Write-Host "- Check VcXsrv is running: " -NoNewline
-    Write-Host "Get-Process -Name vcxsrv" -ForegroundColor Gray
-    Write-Host "- Manual VcXsrv start: " -NoNewline  
-    Write-Host "C:\Scripts\start-vcxsrv.bat" -ForegroundColor Gray
-    Write-Host "- Docker status: " -NoNewline
-    Write-Host "docker info" -ForegroundColor Gray
+
     
     Write-Host "`n" -NoNewline
     Write-Host "📁 Created files:" -ForegroundColor $Cyan
-    Write-Host "- VcXsrv startup script: C:\Scripts\start-vcxsrv.bat" -ForegroundColor Gray
-    Write-Host "- Scheduled task: 'Android Dev - VcXsrv Autostart'" -ForegroundColor Gray
+
     
     Write-Host "`nHappy coding! 🚀" -ForegroundColor $Green
 }
