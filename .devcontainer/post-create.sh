@@ -53,6 +53,18 @@ chmod +x /root/Desktop/AndroidStudio.desktop
 # ADB Server starten
 $ANDROID_SDK_ROOT/platform-tools/adb start-server
 
+# Git configuration check
+echo "🔧 Checking Git configuration..."
+if ! git config user.name >/dev/null 2>&1 || ! git config user.email >/dev/null 2>&1; then
+    echo "⚠️  Git user not configured!"
+    echo "Please run these commands to set up Git:"
+    echo "  git config --global user.name \"Your Name\""
+    echo "  git config --global user.email \"your.email@example.com\""
+    echo ""
+else
+    echo "✅ Git configuration found - you're ready to commit!"
+fi
+
 echo "✅ Android Development Container setup complete!"
 echo ""
 echo "🎯 How to use:"

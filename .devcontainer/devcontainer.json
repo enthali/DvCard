@@ -11,7 +11,9 @@
     // Mount für Gradle Cache (Performance)  
     "source=gradle-cache,target=/root/.gradle,type=volume",
     // KVM Device für Android Emulator Hardware Acceleration
-    "source=/dev/kvm,target=/dev/kvm,type=bind"
+    "source=/dev/kvm,target=/dev/kvm,type=bind",
+    // Forward host Git configuration to container
+    "source=${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind,consistency=cached"
   ],
   "runArgs": [
     "--privileged",
