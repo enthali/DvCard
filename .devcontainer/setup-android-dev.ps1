@@ -92,6 +92,17 @@ function Install-Prerequisites {
     }
 
     # Install VcXsrv
+    if (-not (Test-Path "C:\Program Files\VcXsrv\vcxsrv.exe")) {
+        Write-Step "Installing VcXsrv X11 Server..."
+        try {
+            winget install --id marha.VcXsrv --accept-package-agreements --accept-source-agreements
+            Write-Success "VcXsrv installed"
+        } catch {
+            Write-Warning "Failed to install VcXsrv via winget. Please install manually."
+        }
+    } else {
+        Write-Success "VcXsrv already installed"
+    }
 
 
     # Install VS Code
@@ -142,7 +153,21 @@ function Install-VSCodeExtensions {
 }
 
 function Setup-VcXsrvAutostart {
-
+    Write-Step "Setting up VcXsrv autostart..."
+    
+    $startupPath = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup"
+    $batchFile = "$startupPath\start-vcxsrv.bat"
+    
+    $batchContent = '@echo off
+"C:\Program Files\VcXsrv\vcxsrv.exe" :0 -ac -terminate -lesspointer -multiwindow -clipboard -wgl -dpi auto'
+    
+    try {
+        $batchContent | Out-File -FilePath $batchFile -Encoding ascii
+        Write-Success "VcXsrv autostart configured"
+        Write-Info "VcXsrv will start automatically on next login"
+    } catch {
+        Write-Warning "Failed to setup VcXsrv autostart: $($_.Exception.Message)"
+    }
 }
 
 function Setup-WSLKvmSupport {
