@@ -9,15 +9,10 @@
     // Mount für Android SDK Cache (Performance)
     "source=android-sdk-cache,target=/android-sdk,type=volume",
     // Mount für Gradle Cache (Performance)  
-    "source=gradle-cache,target=/root/.gradle,type=volume",
-    // KVM Device für Android Emulator Hardware Acceleration
-    "source=/dev/kvm,target=/dev/kvm,type=bind",
-    // Forward host Git configuration to container
-    "source=${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind,consistency=cached"
+    "source=gradle-cache,target=/root/.gradle,type=volume"
   ],
   "runArgs": [
-    "--privileged",
-    "--device=/dev/kvm:/dev/kvm"
+    "--privileged"
   ],
   "containerEnv": {
     "DISPLAY": "host.docker.internal:0.0",
@@ -29,7 +24,7 @@
     "ANDROID_HOME": "/android-sdk",
     "ANDROID_SDK_ROOT": "/android-sdk"
   },
-  "postCreateCommand": ".devcontainer/post-create.sh",
+  // "postCreateCommand": ".devcontainer/post-create.sh",
   "remoteUser": "root",
   "customizations": {
     "vscode": {
