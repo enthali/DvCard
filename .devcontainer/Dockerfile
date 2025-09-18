@@ -81,6 +81,7 @@ RUN echo "🖥️  Installing GUI libraries..." && apt-get update && apt-get ins
     libgtk-3-0 \
     libxss1 \
     libasound2 \
+    libpulse0 \
     && echo "✅ GUI libraries installed!" \
     && rm -rf /var/lib/apt/lists/*
 
