@@ -31,6 +31,12 @@ RUN echo "☕ Installing Java 21..." && apt-get update && apt-get install -y -q 
     && echo "✅ Java 21 installed: $(java -version 2>&1 | head -1)" \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Chromium browser and dependencies
+RUN apt-get update && \
+    apt-get install -y chromium-browser chromium-driver --no-install-recommends && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 # Umgebungsvariablen setzen
 ENV JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 ENV PATH=$PATH:$JAVA_HOME/bin
