@@ -27,5 +27,10 @@ echo "🌐 URL: http://localhost:6080"
 echo "🔑 Password: vscode"
 echo "📺 Local DISPLAY set to: $VNC_DISPLAY"
 
+# Start Android Studio in background
+echo "🚀 Starting Android Studio..."
+nohup /opt/android-studio/bin/studio.sh > ~/.android-studio.log 2>&1 &
+echo "✅ Android Studio started in background"
+
 # Log execution time
 echo "post-start.sh executed at $(date)" >> ~/.devcontainer-post-start.log
