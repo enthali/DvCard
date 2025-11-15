@@ -21,10 +21,19 @@ RUN apt-get update && echo "📦 Installing system packages..." && apt-get insta
     lsb-release \
     software-properties-common \
     locales \
+    sudo \
     && echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
     && locale-gen \
     && echo "✅ System packages installed!" \
     && rm -rf /var/lib/apt/lists/*
+
+# Non-root User erstellen
+RUN echo "👤 Creating vscode user..." \
+    && groupadd --gid 1000 vscode \
+    && useradd --uid 1000 --gid 1000 -m -s /bin/bash vscode \
+    && echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/vscode \
+    && chmod 0440 /etc/sudoers.d/vscode \
+    && echo "✅ User vscode created!"
 
 # Java 21 installieren (mit Progress)
 RUN echo "☕ Installing Java 21..." && apt-get update && apt-get install -y -q openjdk-21-jdk \
@@ -58,7 +67,8 @@ RUN echo "📱 Installing Android SDK components..." \
     "build-tools;36.0.0" \
     "platform-tools" \
     "tools" \
-    && echo "✅ Android SDK components installed!"
+    && echo "✅ Android SDK components installed!" \
+    && chown -R vscode:vscode $ANDROID_SDK_ROOT
 
 # Android Studio installieren (mit Progress)
 RUN echo "🚀 Installing Android Studio..." && cd /opt \
@@ -85,14 +95,17 @@ RUN echo "🖥️  Installing GUI libraries..." && apt-get update && apt-get ins
     && rm -rf /var/lib/apt/lists/*
 
 # WSLg Unterstützung
-ENV XDG_RUNTIME_DIR=/tmp/runtime-root
-RUN mkdir -p $XDG_RUNTIME_DIR && chmod 700 $XDG_RUNTIME_DIR
+ENV XDG_RUNTIME_DIR=/tmp/runtime-vscode
+RUN mkdir -p $XDG_RUNTIME_DIR && chown vscode:vscode $XDG_RUNTIME_DIR && chmod 700 $XDG_RUNTIME_DIR
 
 # Workspace Verzeichnis
-WORKDIR /workspace
+WORKSPACE /workspace
 
 # Port für ADB
 EXPOSE 5037
+
+# Als vscode User wechseln
+USER vscode
 
 # Standard Command
 CMD ["bash"]

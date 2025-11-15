@@ -9,7 +9,7 @@
     // Mount für Android SDK Cache (Performance)
     "source=android-sdk-cache,target=/android-sdk,type=volume",
     // Mount für Gradle Cache (Performance)  
-    "source=gradle-cache,target=/root/.gradle,type=volume",
+    "source=gradle-cache,target=/home/vscode/.gradle,type=volume",
     // KVM Device für Android Emulator Hardware Acceleration
     "source=/dev/kvm,target=/dev/kvm,type=bind"
   ],
@@ -28,7 +28,7 @@
     "ANDROID_SDK_ROOT": "/android-sdk"
   },
   "postCreateCommand": ".devcontainer/post-create.sh",
-  "remoteUser": "root",
+  "remoteUser": "vscode",
   "customizations": {
     "vscode": {
       "extensions": [
