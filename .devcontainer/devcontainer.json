@@ -10,11 +10,10 @@
       "vncPort": 5901
     }
   },
-  "forwardPorts": [6080, 5037, 8080],
+  "forwardPorts": [6080, 5037],
   "portsAttributes": {
     "6080": { "label": "noVNC (Android Studio GUI)" },
-    "5037": { "label": "ADB Server" },
-    "8080": { "label": "App Development Server" }
+    "5037": { "label": "ADB Server" }
   },
   "mounts": [
     // Mount für Android SDK Cache (Performance)
