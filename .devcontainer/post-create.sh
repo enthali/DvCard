@@ -25,8 +25,14 @@ else
     if ! avdmanager list avd | grep -q "TestPixelSoft"; then
         echo "📱 Creating software-emulated AVD..."
         echo "no" | avdmanager create avd -n "TestPixelSoft" -k "system-images;android-36;google_apis_playstore;x86_64" -d "pixel_4"
-        echo "hw.gpu.enabled=yes" >> ~/.android/avd/TestPixelSoft.avd/config.ini
-        echo "hw.gpu.mode=swiftshader_indirect" >> ~/.android/avd/TestPixelSoft.avd/config.ini
+        # Software-Rendering konfigurieren
+        cat >> ~/.android/avd/TestPixelSoft.avd/config.ini << EOF
+hw.gpu.enabled=yes
+hw.gpu.mode=swiftshader_indirect
+hw.cpu.ncore=4
+hw.ramSize=2048
+EOF
+        echo "✅ TestPixelSoft AVD created with software rendering"
     fi
 fi
 
