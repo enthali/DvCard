@@ -36,8 +36,9 @@ chmod +x ./gradlew
 # Android SDK Lizenzen akzeptieren
 yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
 
-# Gradle Cache vorbereiten
-mkdir -p /root/.gradle
+# Gradle Cache vorbereiten und Besitzrechte setzen
+mkdir -p /home/vscode/.gradle
+sudo chown -R vscode:vscode /home/vscode/.gradle
 
 # Android Studio Desktop-Verknüpfung erstellen
 cat > /root/Desktop/AndroidStudio.desktop << EOF

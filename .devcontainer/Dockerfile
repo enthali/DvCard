@@ -72,12 +72,13 @@ RUN echo "📱 Installing Android SDK components..." \
 
 # Android Studio installieren (mit Progress)
 # Check for latest version at: https://developer.android.com/studio/archive
+# Using Otter stable release (2025.2.1.7) from October 30, 2025
 RUN echo "🚀 Installing Android Studio..." && cd /opt \
     && echo "⬇️  Downloading Android Studio (~1.5GB)..." \
-    && wget --progress=bar:force https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2025.2.1.9/android-studio-2025.2.1.9-linux.tar.gz \
+    && wget --progress=bar:force https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2025.2.1.7/android-studio-2025.2.1.7-linux.tar.gz \
     && echo "📦 Extracting Android Studio..." \
-    && tar -xzf android-studio-2025.2.1.9-linux.tar.gz \
-    && rm android-studio-2025.2.1.9-linux.tar.gz \
+    && tar -xzf android-studio-2025.2.1.7-linux.tar.gz \
+    && rm android-studio-2025.2.1.7-linux.tar.gz \
     && ln -s /opt/android-studio/bin/studio.sh /usr/local/bin/studio \
     && echo "✅ Android Studio installed!"
 
