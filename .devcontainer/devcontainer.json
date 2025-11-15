@@ -3,8 +3,19 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
-  "features": {},
-  "forwardPorts": [5037, 8080],
+  "features": {
+    "ghcr.io/devcontainers/features/desktop-lite:1": {
+      "password": "vscode",
+      "webPort": 6080,
+      "vncPort": 5901
+    }
+  },
+  "forwardPorts": [6080, 5037, 8080],
+  "portsAttributes": {
+    "6080": { "label": "noVNC (Android Studio GUI)" },
+    "5037": { "label": "ADB Server" },
+    "8080": { "label": "App Development Server" }
+  },
   "mounts": [
     // Mount für Android SDK Cache (Performance)
     "source=android-sdk-cache,target=/android-sdk,type=volume",
@@ -18,22 +29,15 @@
     "--device=/dev/kvm:/dev/kvm"
   ],
   "containerEnv": {
-    "DISPLAY": "host.docker.internal:0.0",
+    "DISPLAY": ":1",
     "LANG": "en_US.UTF-8",
     "LANGUAGE": "en_US:en",
     "LC_ALL": "en_US.UTF-8",
-    "LIBGL_ALWAYS_INDIRECT": "1",
-    "XDG_RUNTIME_DIR": "/tmp",
     "ANDROID_HOME": "/android-sdk",
     "ANDROID_SDK_ROOT": "/android-sdk"
   },
-  // postCreateCommand added
   "postCreateCommand": ".devcontainer/post-create.sh",
-  // postStartCommand  added
-	"postStartCommand": "bash .devcontainer/post-start.sh",
-  // postAttachCommand added
-	"postAttachCommand": "bash .sevcontainer/post-attach.sh",
-  //
+  "postStartCommand": "bash .devcontainer/post-start.sh",
   "remoteUser": "vscode",
   "customizations": {
     "vscode": {

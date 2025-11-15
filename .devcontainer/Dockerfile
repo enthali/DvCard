@@ -80,7 +80,7 @@ RUN echo "🚀 Installing Android Studio..." && cd /opt \
     && ln -s /opt/android-studio/bin/studio.sh /usr/local/bin/studio \
     && echo "✅ Android Studio installed!"
 
-# GUI-Libraries für Android Studio (WSLg optimiert)
+# GUI-Libraries für Android Studio (NoVNC optimiert)
 RUN echo "🖥️  Installing GUI libraries..." && apt-get update && apt-get install -y -q \
     libxext6 \
     libxrender1 \
@@ -91,15 +91,16 @@ RUN echo "🖥️  Installing GUI libraries..." && apt-get update && apt-get ins
     libgtk-3-0 \
     libxss1 \
     libasound2 \
+    dbus-x11 \
+    x11-utils \
     && echo "✅ GUI libraries installed!" \
     && rm -rf /var/lib/apt/lists/*
 
-# WSLg Unterstützung
-ENV XDG_RUNTIME_DIR=/tmp/runtime-vscode
-RUN mkdir -p $XDG_RUNTIME_DIR && chown vscode:vscode $XDG_RUNTIME_DIR && chmod 700 $XDG_RUNTIME_DIR
+# NoVNC wird vom desktop-lite Feature bereitgestellt
+# Kein manuelles Setup nötig - Feature übernimmt VNC Server + noVNC Web Interface
 
 # Workspace Verzeichnis
-WORKSPACE /workspace
+WORKDIR /workspace
 
 # Port für ADB
 EXPOSE 5037
