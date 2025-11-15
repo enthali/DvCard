@@ -1,3 +1,5 @@
+
+# Ignore Gradle files
 *.iml
 .gradle
 /local.properties
@@ -12,9 +14,13 @@ local.properties
 /docs/project_context.md
 /app/release/app-release.aab
 
+
+# Temporary- and logfiles
+/temp
+
 /TODO.md
 
-# Keystore-Sicherheit
+# Keystore-secrets
 dvcard-keys/keystore.properties
 *.jks
 *.keystore

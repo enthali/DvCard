@@ -66,3 +66,5 @@ else
 fi
 echo "  • AVDs are pre-configured and ready to use"
 echo ""
+
+echo "on-create.sh executed at $(date)" > ./devcontainer/post-create-ran

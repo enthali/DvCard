@@ -1,0 +1,1 @@
+echo "on-attach.sh executed at $(date)" > ./devcontainer/post-attach-ran

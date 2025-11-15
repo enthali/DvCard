@@ -27,7 +27,13 @@
     "ANDROID_HOME": "/android-sdk",
     "ANDROID_SDK_ROOT": "/android-sdk"
   },
+  // postCreateCommand added
   "postCreateCommand": ".devcontainer/post-create.sh",
+  // postStartCommand  added
+	"postStartCommand": "bash .devcontainer/post-start.sh",
+  // postAttachCommand added
+	"postAttachCommand": "bash .sevcontainer/post-attach.sh",
+  //
   "remoteUser": "vscode",
   "customizations": {
     "vscode": {

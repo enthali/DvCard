@@ -1,0 +1,1 @@
+echo "post-start.sh executed at $(date)" > ./devcontainer/post-start-ran
