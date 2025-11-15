@@ -47,7 +47,7 @@ ENV PATH=$PATH:$JAVA_HOME/bin
 # Android SDK Verzeichnis
 ENV ANDROID_SDK_ROOT=/android-sdk
 ENV ANDROID_HOME=/android-sdk
-ENV PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools
+ENV PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/emulator
 
 # Android Command Line Tools installieren (mit Progress)
 RUN echo "📱 Installing Android SDK..." && mkdir -p $ANDROID_SDK_ROOT/cmdline-tools \
