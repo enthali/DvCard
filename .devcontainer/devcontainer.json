@@ -16,10 +16,10 @@
     "5037": { "label": "ADB Server" }
   },
   "mounts": [
-    // Mount für Android SDK Cache (Performance)
-    "source=android-sdk-cache,target=/android-sdk,type=volume",
-    // Mount für Gradle Cache (Performance)  
-    "source=gradle-cache,target=/home/vscode/.gradle,type=volume"
+    // Mount für Android SDK Cache (Performance) - geteilt zwischen Projekten
+    "source=android-sdk-shared,target=/android-sdk,type=volume",
+    // Mount für Gradle Cache (Performance) - projekt-spezifisch
+    "source=${localWorkspaceFolderBasename}-gradle-cache,target=/home/vscode/.gradle,type=volume"
   ],
   "runArgs": [
     "--privileged"

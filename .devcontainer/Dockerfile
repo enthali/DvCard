@@ -93,6 +93,11 @@ RUN echo "🖥️  Installing GUI libraries..." && apt-get update && apt-get ins
     libgtk-3-0 \
     libxss1 \
     libasound2 \
+    libpulse0 \
+    dbus-x11 \
+    x11-utils \
+    libxss1 \
+    libasound2 \
     dbus-x11 \
     x11-utils \
     && echo "✅ GUI libraries installed!" \
