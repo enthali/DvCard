@@ -73,4 +73,5 @@ echo "  • AVDs are pre-configured and ready to use"
 echo ""
 
 # Log execution time
-echo "on-create.sh executed at $(date)" > ./devcontainer/post-create-ran
+mkdir -p ~/.devcontainer-logs
+echo "on-create.sh executed at $(date)" >> ~/.devcontainer-logs/post-create.log
