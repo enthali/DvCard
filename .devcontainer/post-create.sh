@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Determine project directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+cd "$PROJECT_DIR"
+
 echo "🚀 Setting up Android Development Container..."
 
 # KVM Support prüfen und konfigurieren
@@ -67,4 +72,5 @@ fi
 echo "  • AVDs are pre-configured and ready to use"
 echo ""
 
+# Log execution time
 echo "on-create.sh executed at $(date)" > ./devcontainer/post-create-ran
