@@ -1,5 +1,7 @@
 downloads/
 android-sdk/
+android-studio-settings/
+gradle-home/
 logs/
 *.log
 *.wsb

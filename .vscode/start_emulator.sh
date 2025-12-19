@@ -85,6 +85,29 @@ while true; do
     fi
 done
 
+# Configure ADB for network access (Hyper-V/Sandbox)
+echo
+echo -e "${CYAN}🌐 Configuring ADB Network Access...${NC}"
+
+# Get Hyper-V vEthernet IP (for Sandbox access)
+HOST_IP=$(ip addr show | grep -oP '(?<=inet\s)172\.\d+\.\d+\.\d+' | head -1)
+
+if [ -n "$HOST_IP" ]; then
+    echo -e "${GREEN}  Host IP (Hyper-V): $HOST_IP${NC}"
+    
+    # Kill and restart ADB on specific interface
+    adb kill-server 2>/dev/null
+    sleep 1
+    
+    # Start ADB bound to Hyper-V interface
+    ANDROID_ADB_SERVER_ADDRESS="$HOST_IP" ANDROID_ADB_SERVER_PORT="5037" adb start-server &
+    sleep 2
+    
+    echo -e "${GREEN}✅ ADB accessible on ${HOST_IP}:5037${NC}"
+else
+    echo -e "${YELLOW}⚠️  Hyper-V interface not found - ADB on localhost only${NC}"
+fi
+
 # Start emulator based on choice
 if [ "$SNAPSHOT_CHOICE" -eq $((${#SNAPSHOT_LIST[@]}+1)) ]; then
     # Cold boot
@@ -92,7 +115,7 @@ if [ "$SNAPSHOT_CHOICE" -eq $((${#SNAPSHOT_LIST[@]}+1)) ]; then
     $ANDROID_HOME/emulator/emulator \
         -avd "$SELECTED_AVD" \
         -gpu swiftshader_indirect \
-        -no-snapshot-save
+        -no-snapshot-save &
 else
     # Use selected snapshot
     SELECTED_SNAPSHOT="${SNAPSHOT_LIST[$((SNAPSHOT_CHOICE-1))]}"
@@ -102,7 +125,30 @@ else
         -avd "$SELECTED_AVD" \
         -snapshot "$SELECTED_SNAPSHOT" \
         -no-snapshot-save \
-        -gpu swiftshader_indirect
+        -gpu swiftshader_indirect &
 fi
+
+# Wait for emulator to boot
+echo -e "${CYAN}⏳ Waiting for emulator to boot...${NC}"
+adb wait-for-device
+sleep 5
+
+# Enable TCP/IP for ADB (port 5555)
+echo -e "${CYAN}🔌 Enabling ADB over TCP/IP...${NC}"
+adb tcpip 5555
+sleep 2
+
+# Connect via TCP/IP
+if [ -n "$HOST_IP" ]; then
+    adb connect localhost:5555
+    echo
+    echo -e "${GREEN}✅ Emulator ready!${NC}"
+    echo -e "${YELLOW}📱 Connect from Sandbox with:${NC}"
+    echo -e "   ${WHITE}adb connect ${HOST_IP}:5555${NC}"
+    echo
+fi
+
+# Wait for emulator to be closed
+wait
 
 echo -e "${GREEN}👋 Emulator stopped.${NC}"

@@ -29,9 +29,12 @@ if (-not (Test-Path $avdPath)) {
 }
 
 # Set environment variables to use SANDBOX AVDs
+$androidUserHome = Join-Path $sdkPath ".android"
 $env:ANDROID_SDK_ROOT = $sdkPath
 $env:ANDROID_HOME = $sdkPath
 $env:ANDROID_AVD_HOME = $avdPath
+$env:ANDROID_USER_HOME = $androidUserHome
+$env:ANDROID_EMULATOR_HOME = $androidUserHome
 $env:PATH = "$sdkPath\emulator;$sdkPath\platform-tools;$env:PATH"
 
 Write-Host "=== Android Emulator Launcher ===" -ForegroundColor Cyan
@@ -86,9 +89,66 @@ if ($selectedIndex -lt 0 -or $selectedIndex -ge $avds.Count) {
 $avdName = $avds[$selectedIndex]
 
 Write-Host ""
+Write-Host "Checking ADB Network Setup..." -ForegroundColor Cyan
+
+# Get Hyper-V vEthernet (Default Switch) IP address
+$hyperVAdapter = Get-NetIPAddress -AddressFamily IPv4 | Where-Object {
+    $_.InterfaceAlias -like "*vEthernet*" -and $_.IPAddress -like "172.*"
+} | Select-Object -First 1
+
+if ($null -ne $hyperVAdapter) {
+    $hostIP = $hyperVAdapter.IPAddress
+    Write-Host "  Host IP: $hostIP" -ForegroundColor Green
+    
+    # Check if port forwarding is configured
+    $portProxyRules = netsh interface portproxy show v4tov4 | Out-String
+    if ($portProxyRules -notlike "*$hostIP*5555*") {
+        Write-Host ""
+        Write-Host "  ERROR: Port forwarding not configured!" -ForegroundColor Red
+        Write-Host "  Run setup-adb-forwarding.bat as Administrator first" -ForegroundColor Yellow
+        Write-Host ""
+        pause
+        exit 1
+    }
+    Write-Host "  Port forwarding: OK" -ForegroundColor Green
+} else {
+    Write-Host "  Warning: Hyper-V interface not found" -ForegroundColor Yellow
+    $hostIP = $null
+}
+
+# Start ADB server
+Write-Host "  Starting ADB server..." -ForegroundColor Gray
+& "$sdkPath\platform-tools\adb.exe" start-server 2>&1 | Out-Null
+
+Write-Host ""
 Write-Host "Starting emulator: $avdName" -ForegroundColor Green
 Write-Host "Close this window to stop the emulator"
 Write-Host ""
 
-# Start emulator
-& $emulatorPath -avd $avdName -gpu host
+# Start emulator in background
+$emulatorJob = Start-Process -FilePath $emulatorPath -ArgumentList "-avd", $avdName, "-gpu", "host" -PassThru -NoNewWindow
+
+# Wait for emulator to boot
+Write-Host "Waiting for emulator to boot..." -ForegroundColor Cyan
+& "$sdkPath\platform-tools\adb.exe" wait-for-device
+Start-Sleep -Seconds 5
+
+# Enable TCP/IP for ADB (port 5555)
+Write-Host "Enabling ADB over TCP/IP..." -ForegroundColor Cyan
+& "$sdkPath\platform-tools\adb.exe" tcpip 5555
+Start-Sleep -Seconds 2
+
+# Connect via TCP/IP locally
+& "$sdkPath\platform-tools\adb.exe" connect localhost:5555
+
+Write-Host ""
+Write-Host "Emulator ready!" -ForegroundColor Green
+if ($null -ne $hostIP) {
+    Write-Host ""
+    Write-Host "Connect from Sandbox with:" -ForegroundColor Yellow
+    Write-Host "  adb connect ${hostIP}:5555" -ForegroundColor White
+}
+Write-Host ""
+
+# Wait for emulator to be closed
+$emulatorJob | Wait-Process
