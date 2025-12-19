@@ -1,0 +1,19 @@
+<!-- Datei: dev.wsb -->
+<Configuration>
+  <VGpu>Enable</VGpu>
+  <Networking>Enable</Networking>
+  <MemoryInMB>16384</MemoryInMB>
+  <vCPU>8</vCPU>
+  <MappedFolders>
+    <MappedFolder>
+      <HostFolder>{{PROJECT_ROOT}}</HostFolder>
+      <SandboxFolder>C:\dev</SandboxFolder>
+      <ReadOnly>false</ReadOnly>
+    </MappedFolder>
+  </MappedFolders>
+
+  <LogonCommand>
+    <Command>cmd /c "start powershell.exe -NoExit -ExecutionPolicy Bypass -File C:\dev\.sandbox\main.ps1"</Command>
+  </LogonCommand>
+
+</Configuration>

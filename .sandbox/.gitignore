@@ -1,0 +1,6 @@
+downloads/
+android-sdk/
+logs/
+*.log
+*.wsb
+config/*.json
