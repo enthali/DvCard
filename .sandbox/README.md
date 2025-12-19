@@ -30,11 +30,11 @@ Automatisiertes Setup für eine portable Android-Entwicklungsumgebung in Windows
    ```
 3. Sandbox starten:
    ```powershell
-   .\.sandbox\start_sandbox.bat
+   .\.sandbox\host-scripts\start_sandbox.bat
    ```
    oder per PowerShell:
    ```powershell
-   .\.sandbox\start_sandbox.ps1
+   .\.sandbox\host-scripts\start_sandbox.ps1
    ```
 4. Die Sandbox startet und installiert automatisch alle Tools
 5. **Beim ersten Mal:** ~3.6 GB Downloads (Android Studio + SDK + Tools)
@@ -42,10 +42,10 @@ Automatisiertes Setup für eine portable Android-Entwicklungsumgebung in Windows
 
 ### Folgende Starts
 
-Einfach Doppelklick auf `.sandbox\start_sandbox.bat` oder:
+Einfach Doppelklick auf `.sandbox\host-scripts\start_sandbox.bat` oder:
 
 ```powershell
-.\.sandbox\start_sandbox.ps1
+.\.sandbox\host-scripts\start_sandbox.ps1
 ```
 
 Alle Downloads sind gecacht, nur noch die Installation läuft - **deutlich schneller!**
@@ -55,8 +55,11 @@ Alle Downloads sind gecacht, nur noch die Installation läuft - **deutlich schne
 ```
 .
 ├── .sandbox/                        # Komplettes Sandbox-Setup (wie .github, .vscode)
-│   ├── start_sandbox.bat            # Startet die Sandbox (Doppelklick)
-│   ├── start_sandbox.ps1            # PowerShell Starter-Script
+│   ├── host-scripts/                # Scripts die auf dem HOST laufen
+│   │   ├── start_sandbox.bat        # Sandbox starten (Doppelklick)
+│   │   ├── start_sandbox.ps1        # Sandbox starten (PowerShell)
+│   │   ├── start_emulator.bat       # Emulator auf Host starten
+│   │   └── start_emulator.ps1       # Emulator Launcher
 │   ├── main.ps1                     # Haupt-Setup-Script (läuft in Sandbox)
 │   │                                # Phase 1: Installation (parallel)
 │   │                                # Phase 2: Konfiguration (sequenziell)
@@ -195,6 +198,29 @@ Die Konfigurationen werden automatisch in Phase 2 geladen.
 - Das gemappte Verzeichnis (`C:\dev` in der Sandbox) entspricht dem Projekt-Ordner auf dem Host
 - **Git-Konfiguration** ist jetzt persistent! (siehe oben)
 
+## � Android Emulator (außerhalb Sandbox)
+
+**Wichtig:** Der Android Emulator funktioniert **NICHT** innerhalb der Sandbox, da Windows Sandbox kein Nested Virtualization unterstützt.
+
+**Lösung:** Emulator auf dem Host starten, nutzt das gleiche SDK!
+
+### Emulator auf Host starten
+
+1. **AVD in Android Studio erstellen** (einmalig, in der Sandbox):
+   - Tools → Device Manager → Create Device
+   - Z.B. "Pixel 8 Pro" mit aktuellem Android
+
+2. **Emulator vom Host starten**:
+   ```powershell
+   .\.sandbox\host-scripts\start_emulator.bat
+   ```
+
+Der Emulator nutzt das persistente SDK aus `.sandbox/android-sdk/` und läuft mit voller Hardware-Beschleunigung auf dem Host! 🚀
+
+**Workflow:**
+- **Code-Development:** In der Sandbox (saubere Umgebung)
+- **Testing:** Emulator auf Host oder echtes Android-Gerät via USB
+
 ## 🐛 Troubleshooting
 
 ### Sandbox startet nicht
@@ -208,6 +234,10 @@ Die Konfigurationen werden automatisch in Phase 2 geladen.
 ### Android SDK wird neu geladen
 - Prüfen ob `android-sdk/` Ordner existiert und gefüllt ist
 - Symlink-Status in der Sandbox überprüfen: `Get-Item $env:LOCALAPPDATA\Android\Sdk`
+
+### Emulator findet SDK nicht
+- Sandbox mindestens einmal gestartet haben (SDK Download)
+- AVD in Android Studio erstellt haben
 
 ## 📝 Lizenz
 

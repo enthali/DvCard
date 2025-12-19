@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 # 1. Get current absolute path (sandbox directory)
-$sandboxDir = (Get-Item $PSScriptRoot).FullName
+$sandboxDir = Split-Path $PSScriptRoot -Parent
 $projectRoot = Split-Path $sandboxDir -Parent
 Write-Host "Starting Sandbox from: $projectRoot"
 Write-Host "Sandbox config: $sandboxDir"
