@@ -118,15 +118,25 @@ if ($null -ne $hyperVAdapter) {
 
 # Start ADB server
 Write-Host "  Starting ADB server..." -ForegroundColor Gray
-& "$sdkPath\platform-tools\adb.exe" start-server 2>&1 | Out-Null
+Start-Process -FilePath "$sdkPath\platform-tools\adb.exe" -ArgumentList "start-server" -WindowStyle Hidden -Wait
 
 Write-Host ""
 Write-Host "Starting emulator: $avdName" -ForegroundColor Green
+Write-Host "Emulator path: $emulatorPath" -ForegroundColor Gray
 Write-Host "Close this window to stop the emulator"
 Write-Host ""
 
 # Start emulator in background
+Write-Host "Launching emulator process..." -ForegroundColor Gray
 $emulatorJob = Start-Process -FilePath $emulatorPath -ArgumentList "-avd", $avdName, "-gpu", "host" -PassThru -NoNewWindow
+
+if ($null -eq $emulatorJob) {
+    Write-Host "ERROR: Failed to start emulator!" -ForegroundColor Red
+    pause
+    exit 1
+}
+
+Write-Host "Emulator process started (PID: $($emulatorJob.Id))" -ForegroundColor Green
 
 # Wait for emulator to boot
 Write-Host "Waiting for emulator to boot..." -ForegroundColor Cyan
